@@ -305,21 +305,25 @@ Quick answer: they're different products solving different problems. You don't h
 - You don't want to pay for another platform subscription
 - You want tool boundaries enforced at the platform level, not just by prompt
 
-### What it doesn't do (vs Copilot Cowork)
+### What it doesn't do (vs Copilot Cowork) — fact-checked honestly
 
-Honest list — most "limitations" are smaller than they look:
+After verifying every "limitation" against GitHub's own docs and the MCP ecosystem (3 AI models + Opus 4.7 confirmation against direct source URLs), the genuinely remaining gaps are smaller than first written:
 
-- **No in-document editing of Excel / Word / PowerPoint** — workiq MCP does Q&A and search over org data, but doesn't write into Office documents. Cowork edits docs in-app via the Copilot-in-Office layer, which isn't exposed via MCP.
-- **No automatic shared context across separate `--agent` one-shot calls** — each one-shot CLI invocation is its own session. Inside a single interactive `copilot` session, the main agent can delegate to sub-agents and context flows. With `/fleet`, parallel agents share the initial prompt but not each other's results.
-- **No fully-managed governance** — Copilot Business/Enterprise has admin controls (audit, content exclusions, model restrictions), but Agent 365's deeper per-agent identity, tenant-wide policy, and Defender/Purview integration is its own product
-- **CLI-first UX** — the same agent files also work in VS Code Copilot Chat (GUI), but non-technical users on a managed laptop will find VS Code or Cowork more natural than a terminal
+- **Local CLI prompts aren't captured in the enterprise audit log by default.** Copilot's audit log [explicitly excludes client session data](https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-enterprise/review-audit-logs): *"The audit log does not include client session data, such as the prompts a user sends to Copilot locally. A custom solution is required to access this data."* Cowork runs server-side so its prompts flow through tenant governance natively.
+- **No turnkey Microsoft Purview / Defender connector for Copilot agent telemetry.** GitHub does support [streaming audit logs to Azure Event Hubs and Azure Blob Storage](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/streaming-the-audit-log-for-your-enterprise), so you can build the pipeline; there's no first-party one-click connector documented.
+- **`/fleet` subagents have separate context windows.** Per the [fleet docs](https://docs.github.com/en/copilot/concepts/agents/copilot-cli/fleet): *"Each subagent has its own context window, separate from the main agent and other subagents."* This is by design (avoids blowing up token usage) but means parallel reviewers don't see each other's output mid-flight.
+- **In-document editing of Excel / Word / PowerPoint requires a community MCP server.** Cowork edits Office docs in-app via the Copilot-in-Office layer. The same outcome is achievable in Copilot CLI by adding any of: [`excel-mcp-server`](https://pypi.org/project/excel-mcp-server/) (cells, formulas, formatting, charts, pivot tables), [`Office-Word-MCP-Server`](https://github.com/GongRzhe/Office-Word-MCP-Server), [`Office-PowerPoint-MCP-Server`](https://github.com/GongRzhe/Office-PowerPoint-MCP-Server) (32 tools), or [`@microsoft/workiq@preview`](https://www.npmjs.com/package/@microsoft/workiq) (with `upload_blob_work_iq` for file-level writes). We don't ship these wired by default.
 
-### What it DOES that the earlier table understated
+### What it DOES that earlier wording understated (verified against GitHub docs)
 
-- **Multi-step orchestration**: autopilot mode lets one agent chain workiq calls — "find tomorrow's conflicts → draft a reschedule email → confirm" runs in one invocation
-- **Federated MCP connectors**: if your tenant admin wired monday.com / S&P Global / Miro etc. into M365 as federated Copilot connectors, Work IQ federates them and our workiq MCP sees them automatically — no separate wiring
-- **Cloud / headless execution**: devops-agent runs in GitHub Actions via the included `.github/workflows/diagnose-failure.yml`. Copilot CLI's cloud agent feature covers other headless workflows.
-- **Work IQ semantic index access**: mail-agent and workspace-agent have it via the official `@microsoft/workiq` MCP — same Work IQ that powers Cowork
+- **Session persistence**: every CLI session is [stored locally in `~/.copilot/session-state/`](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference) with a SQLite `session-store.db`. Resume any past session with `copilot --continue` (most recent) or `copilot --resume [SESSION-ID]`.
+- **Chronicle** (`/chronicle` slash command, currently experimental — enable via `/experimental on`): query your own session history, generate standup reports, get personalised tips.
+- **Copilot Memory** (public preview): [used by Copilot CLI](https://docs.github.com/en/copilot/concepts/agents/copilot-memory) — stored facts and preferences persist across sessions for the same user.
+- **Cross-session shared state via MCP** — the official [`@modelcontextprotocol/server-memory`](https://github.com/modelcontextprotocol/servers/tree/main/src/memory) gives any agent a persistent knowledge graph (`create_entities`, `add_observations`, `search_nodes`, …), shared across runs.
+- **Enterprise per-agent identity & governance**: agent sessions appear in audit with an `agent_session_id` field and can be filtered with `agent:<name>` ([reference](https://docs.github.com/en/copilot/reference/agentic-audit-log-events)). Enterprise owners can lock policies that organisation owners can't override ([policies docs](https://docs.github.com/en/copilot/concepts/policies)), and configure an [MCP allowlist](https://docs.github.com/en/copilot/concepts/mcp-management) (`Allow all` / `Registry only`) that applies to Copilot CLI.
+- **Federated MCP connectors**: if your M365 admin wired monday.com / S&P Global / Miro / etc. as federated Copilot connectors, Work IQ federates them and `@microsoft/workiq` MCP sees them automatically.
+- **Cloud / headless execution**: devops-agent runs in GitHub Actions via the shipped `.github/workflows/diagnose-failure.yml`.
+- **Multi-step orchestration**: autopilot mode lets a single agent chain calls — "find tomorrow's conflicts → draft a reschedule email → confirm" in one invocation.
 
 ### Setup notes (not limitations)
 
