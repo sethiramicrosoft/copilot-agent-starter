@@ -2,14 +2,14 @@
 
 Domain agents live in `~/.copilot/agents/*.agent.md` machine-wide and in `.github/agents/*.agent.md` per repo.
 
-## Cast
+## Cast (with default backend)
 
-- `mail-agent` — email, calendar, inbox triage (any mail provider)
-- `project-agent` — issues, PRs, tasks, releases (GitHub, GitLab, Jira, Azure DevOps)
-- `data-agent` — SQL queries, file analysis, data summaries (any database)
-- `devops-agent` — CI/CD, pipelines, Dockerfiles (any CI/CD tool, shell fallback)
-- `workspace-agent` — team collaboration, notes, documents (M365, Slack, Notion, Confluence)
-- `research-agent` — web + code deep research, cited reports
+- `mail-agent` — email, calendar, inbox triage. **Pre-wired**: Microsoft 365 (Outlook) via `@microsoft/workiq`. Alternatives in `mcp-examples/mail/`.
+- `project-agent` — issues, PRs, tasks, releases. **Pre-wired**: GitHub via Copilot CLI's built-in `github/*` MCP (no setup). Alternatives for GitLab, Jira in `mcp-examples/vcs/`.
+- `data-agent` — SQL queries, file analysis, data summaries. **Not pre-wired**: DB path/creds vary per user — see `mcp-examples/database/` for SQLite, Postgres, MS SQL, Snowflake.
+- `devops-agent` — CI/CD, pipelines, Dockerfiles. **Pre-wired**: GitHub Actions via built-in `github/*` MCP + shell. Alternatives for GitLab CI, Azure DevOps in `mcp-examples/cicd/`.
+- `workspace-agent` — team collaboration, notes, documents. **Pre-wired**: Microsoft 365 (Teams, SharePoint, OneDrive) via `@microsoft/workiq`. Alternatives for Slack, Notion in `mcp-examples/workspace/`.
+- `research-agent` — web + code deep research, cited reports. **Pre-wired**: built-in web search + GitHub search (no MCP needed).
 
 ## Model assignment
 
@@ -25,11 +25,14 @@ Domain agents live in `~/.copilot/agents/*.agent.md` machine-wide and in `.githu
 ## How to invoke
 
 ```
-/agent                                                              ← browse and select interactively
-Use the data-agent to...                                            ← call by name in prompt
-copilot --agent devops-agent -p "..." --allow-all-urls        ← one-shot CLI
-copilot                                                          ← interactive session
+/agent                                                          ← interactive: browse and select
+Use the data-agent to...                                        ← interactive: call by name in prompt
+copilot --agent devops-agent -p "..." --allow-all               ← one-shot CLI
+copilot                                                         ← start interactive session
+copilot --resume                                                ← pick a past session to continue
 ```
+
+These same agent files also work in **VS Code Copilot Chat** — VS Code reads from the same `~/.copilot/agents/` directory ([docs](https://code.visualstudio.com/docs/copilot/customization/custom-agents#_custom-agent-file-locations)).
 
 ## Agent boundaries (hard rules)
 
