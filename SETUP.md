@@ -30,7 +30,7 @@ cp -r copilot-agent-starter/agents ~/.copilot/
 
 **Nothing to do** — both agents use Copilot CLI's built-in GitHub MCP, which authenticates with your active Copilot session. Just run them.
 
-### Microsoft 365 (mail-agent, workspace-agent)
+### Microsoft 365 (mail-agent, workspace-agent) — default
 
 ```powershell
 # 1. Accept the workiq EULA
@@ -41,6 +41,30 @@ npx -y @microsoft/workiq ask -q "hello"
 ```
 
 The second command prints a device code, opens your browser, you sign in with your work/school Microsoft account → done.
+
+### Google Workspace (Gmail / Calendar / Drive / Docs / Sheets — alternative to M365)
+
+If you're on Google Workspace instead of M365, swap the workiq config for the community `workspace-mcp` package (PyPI, by taylorwilsdon — actively maintained, covers Gmail, Calendar, Drive, Docs, Sheets, Slides, Forms, Tasks, Contacts, Chat).
+
+**One-time setup:**
+
+1. Create a Google Cloud project at [console.cloud.google.com](https://console.cloud.google.com) (or reuse an existing one).
+2. Enable the APIs you need (Gmail API, Calendar API, Drive API, etc.) — APIs & Services → Library.
+3. Create OAuth 2.0 credentials — APIs & Services → Credentials → Create Credentials → OAuth client ID → Desktop app. Note the Client ID and Client Secret.
+4. Set as env vars (or Copilot secrets):
+
+```powershell
+$env:GOOGLE_OAUTH_CLIENT_ID = "<your-client-id>"
+$env:GOOGLE_OAUTH_CLIENT_SECRET = "<your-client-secret>"
+```
+
+5. Replace the `mcp-servers:` block in `~/.copilot/agents/mail-agent.agent.md` (or `workspace-agent.agent.md`) with the contents of `mcp-examples/mail/gmail.json` (or `mcp-examples/workspace/google-workspace.json`).
+6. First run triggers an OAuth consent flow in your browser. Approve, done.
+
+**Important caveats:**
+- `workspace-mcp` is **community-maintained**, not a first-party Google package. (No equivalent first-party MCP from Google as of May 2026.)
+- You own the OAuth app — you choose which scopes to grant. More setup than workiq's cached device code, but more control over what the agent can do.
+- See [github.com/taylorwilsdon/google_workspace_mcp](https://github.com/taylorwilsdon/google_workspace_mcp) for the latest docs.
 
 ### Verify
 
@@ -96,16 +120,17 @@ The full args and env for each provider are in `mcp-examples/`. The JSON keys (e
 
 | Agent | Pick from |
 |---|---|
-| mail-agent | `mcp-examples/mail/` — outlook.json (`@microsoft/workiq`) |
+| mail-agent | `mcp-examples/mail/` — outlook.json (`@microsoft/workiq` — default), gmail.json (Google Workspace via `workspace-mcp`) |
 | project-agent | `mcp-examples/vcs/` — github.json, gitlab.json, jira.json (Atlassian remote MCP — no install needed) |
 | devops-agent | `mcp-examples/cicd/` — github-actions.json, gitlab-ci.json, azure-devops.json (`@azure-devops/mcp`) |
 | data-agent | `mcp-examples/database/` — postgres.json, sqlite.json (`uvx`, no secret), mssql.json (`@azure/mcp`), snowflake.json (`uvx`) |
-| workspace-agent | `mcp-examples/workspace/` — m365.json (`@microsoft/workiq`), slack.json, notion.json (`@notionhq/notion-mcp-server`) |
+| workspace-agent | `mcp-examples/workspace/` — m365.json (`@microsoft/workiq` — default), google-workspace.json (`workspace-mcp`), slack.json, notion.json |
 | research-agent | No MCP needed — built-in web + GitHub search |
 
 All these match what their `mcp-examples/` configs reference. Notes:
 
 - **GitHub / GitHub Actions**: pre-wired agents use Copilot CLI's built-in `github/*` MCP — no PAT needed for project-agent and devops-agent out of the box. Use `vcs/github.json` or `cicd/github-actions.json` only if you want to override (e.g. scope to a specific PAT).
+- **Google Workspace**: `workspace-mcp` is a community PyPI package by taylorwilsdon — actively maintained, covers Gmail/Calendar/Drive/Docs/Sheets/Slides/Forms/Tasks/Contacts/Chat. Needs your own Google Cloud OAuth app (see Step 2).
 - **Snowflake**: `mcp-snowflake-server` is a community PyPI package (no Snowflake-official one exists as of May 2026).
 - **Postgres / GitLab / Slack**: the `@modelcontextprotocol/server-*` packages are functional but marked deprecated on npm. They still work; replace when better-maintained alternatives ship.
 
@@ -139,6 +164,7 @@ export COPILOT_VCS_TOKEN="<your token>"
 | `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USER`, `SNOWFLAKE_PASSWORD`, `SNOWFLAKE_DATABASE`, `SNOWFLAKE_WAREHOUSE` | `database/snowflake.json` | Passed as `--account`/`--user`/... CLI args by the example config |
 | `COPILOT_WORKSPACE_CLIENT_ID` | `workspace/slack.json` (bot token), `workspace/notion.json` (API key) | Reused across both; rename if you want them separate |
 | `COPILOT_WORKSPACE_TENANT_ID` | `workspace/slack.json` (Slack team ID) | |
+| `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` | `mail/gmail.json`, `workspace/google-workspace.json` | OAuth 2.0 Desktop credentials from your Google Cloud project — see Step 2 |
 
 ---
 

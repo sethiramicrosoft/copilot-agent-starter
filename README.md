@@ -198,7 +198,8 @@ All MCP configs ship in `mcp-examples/` ready to copy into the agent's `mcp-serv
 
 | Agent | Config | Package / endpoint | Secrets needed |
 |---|---|---|---|
-| mail-agent | `mail/outlook.json` | `@microsoft/workiq` (Microsoft) | none in MCP config — uses cached device-code auth (run `npx -y @microsoft/workiq accept-eula` then `ask -q "hello"` once before first use) |
+| mail-agent | `mail/outlook.json` (default) | `@microsoft/workiq` (Microsoft) | none in MCP config — uses cached device-code auth (run `npx -y @microsoft/workiq accept-eula` then `ask -q "hello"` once before first use) |
+| mail-agent (Google) | `mail/gmail.json` | `workspace-mcp` (community, PyPI) | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` — see SETUP.md for the Google Cloud OAuth setup |
 | project-agent | `vcs/github.json` | GitHub MCP server (remote HTTP — `https://api.githubcopilot.com/mcp/`, no install) | `COPILOT_VCS_TOKEN` (GitHub PAT) |
 | project-agent | `vcs/gitlab.json` | `@modelcontextprotocol/server-gitlab` | `COPILOT_VCS_TOKEN` |
 | project-agent | `vcs/jira.json` | Atlassian remote MCP (HTTPS at `mcp.atlassian.com/v1/mcp/authv2`, no install for cloud clients; IDEs need `mcp-remote` Node proxy) | `COPILOT_VCS_TOKEN` (Atlassian API token) |
@@ -209,7 +210,8 @@ All MCP configs ship in `mcp-examples/` ready to copy into the agent's `mcp-serv
 | devops-agent | `cicd/github-actions.json` | GitHub MCP server (remote HTTP — same endpoint as above) | `COPILOT_CICD_TOKEN` (GitHub PAT with `workflow` scope) |
 | devops-agent | `cicd/gitlab-ci.json` | `@modelcontextprotocol/server-gitlab` | `COPILOT_CICD_TOKEN` |
 | devops-agent | `cicd/azure-devops.json` | `@azure-devops/mcp` (Microsoft) | `COPILOT_CICD_ORG`, `COPILOT_CICD_TOKEN` |
-| workspace-agent | `workspace/m365.json` | `@microsoft/workiq` (Microsoft) | none in MCP config — uses cached device-code auth (see mail-agent row) |
+| workspace-agent | `workspace/m365.json` (default) | `@microsoft/workiq` (Microsoft) | none in MCP config — uses cached device-code auth (see mail-agent row) |
+| workspace-agent (Google) | `workspace/google-workspace.json` | `workspace-mcp` (community, PyPI) | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` — covers Gmail, Calendar, Drive, Docs, Sheets, Slides, Forms, Tasks, Contacts, Chat |
 | workspace-agent | `workspace/slack.json` | `@modelcontextprotocol/server-slack` | `COPILOT_WORKSPACE_CLIENT_ID` (bot token), `COPILOT_WORKSPACE_TENANT_ID` (team ID) |
 | workspace-agent | `workspace/notion.json` | `@notionhq/notion-mcp-server` (Notion) | `COPILOT_WORKSPACE_CLIENT_ID` (API key) |
 | research-agent | none needed | built-in web + GitHub search | none |
