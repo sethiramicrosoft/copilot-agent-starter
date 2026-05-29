@@ -6,6 +6,10 @@ No extra subscriptions. Works with whatever GitHub Copilot plan you already have
 
 Companion to [copilot-fleet-starter](https://github.com/sethiramicrosoft/copilot-fleet-starter) — the code review persona fleet. This repo does the work; that repo reviews it.
 
+> **Last verified: 2026-05-29**
+> All 6 default agent paths tested live against real backends (GitHub, Outlook, SharePoint, SQLite). MCP package status checked on npm/PyPI. All pricing and product claims cross-checked against vendor docs (docs.github.com, microsoft.com, anthropic.com) on this date.
+> Microsoft / GitHub / Anthropic publish material changes every 4-8 weeks. If today's date is more than 90 days after the date above, treat specific prices, GA dates, and package status as potentially stale and re-verify before quoting publicly.
+
 ## What this repo gives you
 
 ```
