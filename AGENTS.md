@@ -25,9 +25,10 @@ Domain agents live in `~/.copilot/agents/*.agent.md` machine-wide and in `.githu
 ## How to invoke
 
 ```
-/agent                    ← browse and select interactively
-Use the data-agent to...  ← call by name in prompt
-copilot --agent=devops-agent --prompt "..."  ← CLI flag
+/agent                                                              ← browse and select interactively
+Use the data-agent to...                                            ← call by name in prompt
+gh copilot -- --agent devops-agent -p "..." --allow-all-urls        ← one-shot CLI
+gh copilot                                                          ← interactive session
 ```
 
 ## Agent boundaries (hard rules)
