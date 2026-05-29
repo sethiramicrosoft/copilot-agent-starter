@@ -11,7 +11,7 @@
     ],
     "env": {
       "GITLAB_TOKEN": "${{ secrets.COPILOT_VCS_TOKEN }}",
-      "GITLAB_URL": "https://gitlab.com"
+      "GITLAB_URL": "${{ secrets.COPILOT_VCS_ORG }}"
     }
   }
 }

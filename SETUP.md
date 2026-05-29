@@ -103,48 +103,42 @@ The full args and env for each provider are in `mcp-examples/`. The JSON keys (e
 | workspace-agent | `mcp-examples/workspace/` — m365.json (`@microsoft/workiq`), slack.json, notion.json (`@notionhq/notion-mcp-server`) |
 | research-agent | No MCP needed — built-in web + GitHub search |
 
-All packages are official — published by the tool vendor or the modelcontextprotocol org. No community packages.
+All these match what their `mcp-examples/` configs reference. Notes:
+
+- **GitHub / GitHub Actions**: pre-wired agents use Copilot CLI's built-in `github/*` MCP — no PAT needed for project-agent and devops-agent out of the box. Use `vcs/github.json` or `cicd/github-actions.json` only if you want to override (e.g. scope to a specific PAT).
+- **Snowflake**: `mcp-snowflake-server` is a community PyPI package (no Snowflake-official one exists as of May 2026).
+- **Postgres / GitLab / Slack**: the `@modelcontextprotocol/server-*` packages are functional but marked deprecated on npm. They still work; replace when better-maintained alternatives ship.
 
 ---
 
-## Step 4 — Set secrets (only for agents with MCP wired)
+## Step 4 — Set secrets (only for agents wired to a backend that needs them)
 
-Set secrets as environment variables or Copilot agent secrets. Only set what you actually use.
-
-### M365 / Outlook / Teams (`@microsoft/workiq`) — one-time setup
-
-`@microsoft/workiq` uses Microsoft device code login (no Azure AD app registration needed for personal/interactive use):
+Set as environment variables in your shell (or your CI environment for headless runs). The `${{ secrets.<NAME> }}` syntax in the MCP example files is the GitHub Actions / Copilot cloud-agent secret resolution form; for local CLI use, set the same names as env vars in your shell:
 
 ```powershell
-# 1. Accept the EULA once
-npx -y @microsoft/workiq accept-eula
-
-# 2. Authenticate (opens browser for Microsoft login — caches your account)
-npx -y @microsoft/workiq ask -q "hello"
+# PowerShell
+$env:COPILOT_VCS_TOKEN = "<your token>"
+```
+```bash
+# bash
+export COPILOT_VCS_TOKEN="<your token>"
 ```
 
-After authenticating, no MCP secret is needed — the workiq MCP server picks up your cached credentials automatically.
+### Secrets matrix (only set what you wire)
 
-> **Note:** Earlier versions of this repo passed `--account $WORKIQ_ACCOUNT` to the workiq MCP server. That flag is **not** part of the workiq CLI (verified against the published package May 2026). The MCP server uses whichever account was cached during the `accept-eula` / `ask` interactive auth.
-
-### All other agents
-
-| Secret name | Used by |
-|---|---|
-| `COPILOT_VCS_TOKEN` | project-agent — GitHub/GitLab PAT, or Atlassian API token for Jira |
-| `COPILOT_VCS_ORG` | project-agent (GitHub/GitLab only) |
-| `COPILOT_CICD_TOKEN` | devops-agent |
-| `COPILOT_CICD_ORG` | devops-agent |
-| `COPILOT_DB_CONNECTION_STRING` | data-agent (Postgres) |
-| `AZURE_SUBSCRIPTION_ID` | data-agent (Azure SQL via `@azure/mcp`) |
-| `AZURE_RESOURCE_GROUP` | data-agent (Azure SQL via `@azure/mcp`) |
-| `SNOWFLAKE_ACCOUNT` | data-agent (Snowflake) |
-| `SNOWFLAKE_USER` | data-agent (Snowflake) |
-| `SNOWFLAKE_PASSWORD` | data-agent (Snowflake) |
-| `SNOWFLAKE_DATABASE` | data-agent (Snowflake) |
-| `SNOWFLAKE_WAREHOUSE` | data-agent (Snowflake) |
-| `SLACK_BOT_TOKEN` | workspace-agent (Slack) |
-| `NOTION_API_TOKEN` | workspace-agent (Notion) |
+| Secret | Required by | Notes |
+|---|---|---|
+| (none) | mail-agent, workspace-agent | workiq uses cached device-code auth — see Step 2 |
+| (none) | research-agent | built-in web + GitHub search |
+| `COPILOT_VCS_TOKEN` | `vcs/github.json` (override), `vcs/gitlab.json`, `vcs/jira.json` | GitHub PAT, GitLab PAT, or Atlassian API token |
+| `COPILOT_VCS_ORG` | `vcs/gitlab.json` | GitLab base URL (e.g. `https://gitlab.com` or your self-hosted instance) |
+| `COPILOT_CICD_TOKEN` | `cicd/github-actions.json` (override), `cicd/gitlab-ci.json`, `cicd/azure-devops.json` | Same idea per provider |
+| `COPILOT_CICD_ORG` | `cicd/azure-devops.json`, `cicd/gitlab-ci.json` | Azure DevOps org name, or GitLab URL |
+| `COPILOT_DB_CONNECTION_STRING` | `database/postgres.json` | Full Postgres URL e.g. `postgres://user:pass@host/db` |
+| `AZURE_SUBSCRIPTION_ID`, `AZURE_RESOURCE_GROUP` | `database/mssql.json` | Used by `@azure/mcp` |
+| `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USER`, `SNOWFLAKE_PASSWORD`, `SNOWFLAKE_DATABASE`, `SNOWFLAKE_WAREHOUSE` | `database/snowflake.json` | Passed as `--account`/`--user`/... CLI args by the example config |
+| `COPILOT_WORKSPACE_CLIENT_ID` | `workspace/slack.json` (bot token), `workspace/notion.json` (API key) | Reused across both; rename if you want them separate |
+| `COPILOT_WORKSPACE_TENANT_ID` | `workspace/slack.json` (Slack team ID) | |
 
 ---
 

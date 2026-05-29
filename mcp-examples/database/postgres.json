@@ -4,13 +4,11 @@
     "command": "npx",
     "args": [
       "-y",
-      "@modelcontextprotocol/server-postgres"
+      "@modelcontextprotocol/server-postgres",
+      "${{ secrets.COPILOT_DB_CONNECTION_STRING }}"
     ],
     "tools": [
       "*"
-    ],
-    "env": {
-      "POSTGRES_CONNECTION_STRING": "${{ secrets.COPILOT_DB_CONNECTION_STRING }}"
-    }
+    ]
   }
 }

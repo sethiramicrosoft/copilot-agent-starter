@@ -6,11 +6,13 @@
 # (or as a workflow summary if no PR is open).
 #
 # Requirements:
-#   - GitHub Copilot CLI installed on the runner (see setup step below)
-#   - GITHUB_TOKEN has write access to issues/PRs (default for Actions)
-#   - Your repo has a Copilot seat (any paid plan)
+#   - Node.js on the runner (default on ubuntu-latest) — used to npm install @github/copilot
+#   - GITHUB_TOKEN: default Actions token (write to issues/PRs already in permissions block)
+#   - COPILOT_GITHUB_TOKEN: a PAT with the 'Copilot Requests' permission, added as a repo or org secret
+#     (the standalone copilot binary needs this to authenticate in headless/CI mode)
+#   - A GitHub Copilot seat on the account whose PAT is used
 #
-# No extra secrets needed beyond the standard GITHUB_TOKEN.
+# Reference: https://docs.github.com/en/copilot/how-tos/copilot-cli/automate-copilot-cli/automate-with-actions
 
 name: Diagnose failing workflow
 
@@ -32,10 +34,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install GitHub CLI and Copilot extension
-        # Note: this step takes ~60-90 seconds on a fresh ubuntu-latest runner.
-        # To speed up, pre-bake a custom runner image with gh and gh-copilot installed.
+      - name: Install Copilot CLI
+        # Installs the standalone `copilot` binary (npm package @github/copilot)
+        # plus `gh` for fetching workflow logs. ~60-90s on a fresh ubuntu-latest runner;
+        # pre-bake a custom runner image to skip this.
         run: |
+          # gh is needed to fetch the failed run logs
           type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
           curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
             | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
@@ -44,7 +48,9 @@ jobs:
             https://cli.github.com/packages stable main" \
             | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
           sudo apt update && sudo apt install gh -y
-          gh extension install github/gh-copilot
+
+          # Standalone Copilot CLI (the `copilot` binary)
+          npm install -g @github/copilot
 
       - name: Copy agents to ~/.copilot
         run: |
@@ -76,6 +82,9 @@ jobs:
         id: diagnosis
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Copilot CLI needs a PAT with 'Copilot Requests' scope when running headless.
+          # Add it as a repo/org secret named COPILOT_GITHUB_TOKEN.
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
         run: |
           LOGS=$(cat /tmp/failed_logs.txt)
           PROMPT="The CI workflow '${{ steps.run_info.outputs.workflow_name }}' failed on commit ${{ steps.run_info.outputs.head_sha }}.
@@ -89,7 +98,7 @@ jobs:
 
           Diagnose the root cause. Be specific: identify the failing step, the exact error, and explain why it failed. Then suggest the most likely fix. Keep the response concise — 3 sections max: Root Cause, Why It Failed, Suggested Fix."
 
-          RESULT=$(copilot --agent devops-agent -p "$PROMPT" --allow-all 2>&1)
+          RESULT=$(copilot --agent devops-agent -p "$PROMPT" --allow-all --no-ask-user 2>&1)
           echo "$RESULT" > /tmp/diagnosis.txt
           echo "Diagnosis complete"
 
