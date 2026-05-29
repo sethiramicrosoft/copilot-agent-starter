@@ -97,11 +97,31 @@ All packages are official — published by the tool vendor or the modelcontextpr
 
 Set secrets as environment variables or Copilot agent secrets. Only set what you actually use.
 
+### M365 / Outlook / Teams (`@microsoft/workiq`) — one-time setup
+
+`@microsoft/workiq` uses Microsoft device code login (no Azure AD app registration needed for personal/interactive use):
+
+```powershell
+# 1. Accept the EULA once
+npx -y @microsoft/workiq accept-eula
+
+# 2. Authenticate (opens browser for Microsoft login — caches your account)
+npx -y @microsoft/workiq ask -q "hello"
+```
+
+After authenticating, set one secret:
+
+| Secret name | Value |
+|---|---|
+| `WORKIQ_ACCOUNT` | Your Microsoft account email (e.g. `you@company.com`) |
+
+The MCP server looks up your cached credentials using this email. No client ID or secret needed.
+
+### All other agents
+
 | Secret name | Used by |
 |---|---|
-| `COPILOT_MAIL_CLIENT_ID` | mail-agent (Outlook via `@microsoft/workiq`) |
-| `COPILOT_MAIL_CLIENT_SECRET` | mail-agent |
-| `COPILOT_MAIL_TENANT_ID` | mail-agent |
+| `WORKIQ_ACCOUNT` | mail-agent, workspace-agent (M365/Outlook/Teams) |
 | `COPILOT_VCS_TOKEN` | project-agent — GitHub/GitLab PAT, or Atlassian API token for Jira |
 | `COPILOT_VCS_ORG` | project-agent (GitHub/GitLab only) |
 | `COPILOT_CICD_TOKEN` | devops-agent |
@@ -114,9 +134,8 @@ Set secrets as environment variables or Copilot agent secrets. Only set what you
 | `SNOWFLAKE_PASSWORD` | data-agent (Snowflake) |
 | `SNOWFLAKE_DATABASE` | data-agent (Snowflake) |
 | `SNOWFLAKE_WAREHOUSE` | data-agent (Snowflake) |
-| `COPILOT_WORKSPACE_CLIENT_ID` | workspace-agent (M365/Slack/Notion) |
-| `COPILOT_WORKSPACE_CLIENT_SECRET` | workspace-agent (M365 only) |
-| `COPILOT_WORKSPACE_TENANT_ID` | workspace-agent (M365 only) |
+| `SLACK_BOT_TOKEN` | workspace-agent (Slack) |
+| `NOTION_API_TOKEN` | workspace-agent (Notion) |
 
 ---
 

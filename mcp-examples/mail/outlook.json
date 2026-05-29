@@ -4,15 +4,16 @@
     "command": "npx",
     "args": [
       "-y",
-      "@microsoft/workiq"
+      "@microsoft/workiq",
+      "mcp",
+      "--account",
+      "$WORKIQ_ACCOUNT"
     ],
     "tools": [
       "*"
     ],
     "env": {
-      "WORKIQ_CLIENT_ID": "${{ secrets.COPILOT_MAIL_CLIENT_ID }}",
-      "WORKIQ_CLIENT_SECRET": "${{ secrets.COPILOT_MAIL_CLIENT_SECRET }}",
-      "WORKIQ_TENANT_ID": "${{ secrets.COPILOT_MAIL_TENANT_ID }}"
+      "WORKIQ_ACCOUNT": "${{ secrets.WORKIQ_ACCOUNT }}"
     }
   }
 }
