@@ -39,6 +39,27 @@ Each agent separates two things:
 
 Pick a config from `mcp-examples/`, paste it into the agent's `mcp-servers:` block, set your secrets, done. See [SETUP.md](SETUP.md) for the full walkthrough.
 
+## Tool scoping — enforced, not instructed
+
+Most "agent" setups give the model a prompt that says "only use the tools relevant to your task." That's a suggestion. A model under a complex prompt can ignore it.
+
+This repo uses the `tools:` array in each agent's frontmatter. The platform enforces it — `devops-agent` literally cannot call mail MCP tools because they are not in its tool list. Same for `mcp-servers:` — each agent only loads the MCP servers declared in its own file. No cross-agent data access.
+
+For engineering managers and security teams on GitHub Copilot Business or Enterprise: this means you can audit exactly what each agent can reach by reading a single YAML file. The boundary is a platform constraint, not a prompt instruction that could be overridden.
+
+```yaml
+# devops-agent — can only reach these tools, nothing else
+tools: ["read", "edit", "search", "execute"]
+mcp-servers:
+  cicd-mcp:         # only this MCP — no mail, no database, no workspace
+    type: 'local'
+    command: npx
+    args: ['-y', '@azure-devops/mcp']
+    tools: ["*"]
+```
+
+This is verifiable, diffable, and auditable in version control.
+
 ## Install (2 minutes)
 
 ```powershell
@@ -92,44 +113,56 @@ gh copilot -- --agent research-agent -p "your prompt here" --allow-all-urls
 
 ### mail-agent
 ```
-"Summarise my inbox from the last 48 hours, flag anything urgent, and draft replies for the top 3"
-"Find a free 1-hour slot for 5 people next week and send a calendar invite"
-"Triage everything in my inbox older than 7 days and suggest what to archive"
+gh copilot -- --agent mail-agent -p "Find every unread email from the last 48 hours where someone is waiting on a response from me. List them by urgency with a one-line summary and draft a reply for the top 3." --allow-all
+
+gh copilot -- --agent mail-agent -p "Find a free 1-hour slot that works for alice@company.com, bob@company.com and me next Tuesday or Wednesday between 10am-4pm London time. Propose 2 options." --allow-all
+
+gh copilot -- --agent mail-agent -p "List every email thread older than 14 days where I sent the last message and got no reply. Group by sender domain." --allow-all
 ```
 
 ### project-agent
 ```
-"Create issues for all action items from today's retro and assign them to the current sprint"
-"Open a PR for the feature branch, link it to issue #42, and fill the PR template"
-"Generate a changelog from commits since the last release tag"
+gh copilot -- --agent project-agent -p "Find all GitHub issues labelled 'bug' opened in the last 14 days in this repo. Group by assignee, sort by comment count descending, and output a markdown triage table." --allow-all
+
+gh copilot -- --agent project-agent -p "Open a PR from branch 'feature/payments-v2' into main. Link it to issue #84, use the repo's PR template, and fill the 'What changed' section from the commit messages since the branch point." --allow-all
+
+gh copilot -- --agent project-agent -p "Generate a changelog from all commits merged to main since the last git tag. Group by type: Features, Fixes, Chores. Exclude merge commits." --allow-all
 ```
 
 ### data-agent
 ```
-"Which customers haven't ordered in 90 days? Show me the top 20 by lifetime value"
-"Describe the users table — schema, row count, null rates per column, sample rows"
-"Find any orders where the total doesn't match the sum of line items"
+gh copilot -- --agent data-agent -p "Query the orders table for rows where total != SUM(line_items.amount) for the same order_id. Return the top 20 discrepancies sorted by absolute delta, with order_id, customer_id, recorded total, and calculated total." --allow-all
+
+gh copilot -- --agent data-agent -p "Describe the users table: row count, column names and types, null rate per column, min/max/avg for numeric columns, and 5 sample rows. Flag any column with null rate > 10%." --allow-all
+
+gh copilot -- --agent data-agent -p "Find customers who placed at least 3 orders in the past but have had no activity in the last 90 days. Show the top 20 by lifetime value with their last order date and total spend." --allow-all
 ```
 
 ### devops-agent
 ```
-"Our CI pipeline has failed 3 times in a row — diagnose it and propose a fix"
-"Add a caching step to the build workflow to speed it up"
-"Show me all deployments to production in the last 7 days and who triggered them"
+gh copilot -- --agent devops-agent -p "Fetch the logs from the last 3 failed runs of the 'build' workflow in this repo. Identify if they share a common root cause and propose a fix." --allow-all
+
+gh copilot -- --agent devops-agent -p "Review .github/workflows/build.yml and add a cache step for npm dependencies. Show the diff only — do not write the file." --allow-all
+
+gh copilot -- --agent devops-agent -p "List all workflow runs that deployed to production in the last 7 days. For each: run ID, triggered by, duration, and outcome." --allow-all
 ```
 
 ### workspace-agent
 ```
-"Collect all action items from the #project-alpha channel this week and create tasks for each"
-"Summarise what was decided in the last 3 sprint planning meetings"
-"Find the architecture decision record for the payments service in SharePoint/Notion"
+gh copilot -- --agent workspace-agent -p "Collect every message from the #project-alpha Slack channel this week that contains an action item or a decision. Format as: Decision/Action | Owner | Due date (if mentioned)." --allow-all
+
+gh copilot -- --agent workspace-agent -p "Summarise the last 3 sprint planning meeting notes from SharePoint/Notion. Extract: goals committed, risks flagged, and any items that were pushed to next sprint." --allow-all
+
+gh copilot -- --agent workspace-agent -p "Search SharePoint and Notion for any document titled or tagged 'ADR' related to the payments service. Summarise the decisions made and the date of each." --allow-all
 ```
 
 ### research-agent
 ```
-"Compare Zustand vs Jotai vs Redux Toolkit for a large React app — trade-off table and recommendation"
-"What are the breaking changes in Postgres 17 that would affect our schema?"
-"Find reference implementations of event sourcing in Go on GitHub"
+gh copilot -- --agent research-agent -p "Compare Zustand, Jotai, and Redux Toolkit for a large React app (50+ components, team of 8). Produce a trade-off table covering: bundle size, devtools, async handling, learning curve, and community activity. End with a recommendation." --allow-all-urls
+
+gh copilot -- --agent research-agent -p "What are the breaking changes in Postgres 16 and 17 that would affect a schema using JSONB columns, partial indexes, and row-level security? Cite the release notes." --allow-all-urls
+
+gh copilot -- --agent research-agent -p "Find production-grade reference implementations of the outbox pattern in Go on GitHub. Show repo name, stars, last commit date, and a one-line summary of the approach each uses." --allow-all-urls
 ```
 
 ## Configuring secrets
