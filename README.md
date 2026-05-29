@@ -41,24 +41,20 @@ Pick a config from `mcp-examples/`, paste it into the agent's `mcp-servers:` blo
 
 ## Tool scoping — enforced, not instructed
 
-Most "agent" setups give the model a prompt that says "only use the tools relevant to your task." That's a suggestion. A model under a complex prompt can ignore it.
-
-This repo uses the `tools:` array in each agent's frontmatter. The platform enforces it — `devops-agent` literally cannot call mail MCP tools because they are not in its tool list. Same for `mcp-servers:` — each agent only loads the MCP servers declared in its own file. No cross-agent data access.
-
-For engineering managers and security teams on GitHub Copilot Business or Enterprise: this means you can audit exactly what each agent can reach by reading a single YAML file. The boundary is a platform constraint, not a prompt instruction that could be overridden.
+Most agent setups rely on a prompt saying "only use relevant tools." That's a suggestion. This repo uses the `tools:` array in frontmatter — the platform enforces it. `devops-agent` cannot call mail MCP tools because they're not in its list. Each agent only loads the MCP servers declared in its own file.
 
 ```yaml
-# devops-agent — can only reach these tools, nothing else
+# devops-agent — cannot reach mail or database MCP, platform-enforced
 tools: ["read", "edit", "search", "execute"]
 mcp-servers:
-  cicd-mcp:         # only this MCP — no mail, no database, no workspace
+  cicd-mcp:
     type: 'local'
     command: npx
     args: ['-y', '@azure-devops/mcp']
     tools: ["*"]
 ```
 
-This is verifiable, diffable, and auditable in version control.
+The boundary is verifiable and diffable in version control.
 
 ## Install (2 minutes)
 
