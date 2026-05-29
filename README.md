@@ -167,24 +167,19 @@ gh copilot -- --agent research-agent -p "Find production-grade reference impleme
 
 All MCP configs ship in `mcp-examples/` ready to copy into the agent's `mcp-servers:` block. See [SETUP.md](SETUP.md) for how.
 
-> ⚠️ **Heads-up on MCP package status (May 2026)**: The official `@modelcontextprotocol/server-{github,gitlab,postgres,slack}` packages are marked **deprecated** (`"Package no longer supported"`) on npm — they still work but are no longer maintained by Anthropic. Recommended replacements:
-> - **GitHub** → [`github/github-mcp-server`](https://github.com/github/github-mcp-server) (GitHub's own MCP server)
-> - **GitLab** → [`gitlab-org/editor-extensions/gitlab-mcp-server`](https://gitlab.com/gitlab-org/editor-extensions/gitlab-mcp-server) (GitLab official)
-> - **Postgres / Slack** → no official first-party replacement yet; community packages exist
->
-> The `mcp-examples/` configs still reference the deprecated packages so the repo works out of the box — swap when ready.
+> **MCP package choices (May 2026)**: GitHub's official MCP server is used via remote HTTP (`https://api.githubcopilot.com/mcp/`) — no install. Postgres and Slack still use Anthropic's reference packages from `@modelcontextprotocol/*`; those packages were marked deprecated on npm in early 2026 but remain functional. Snowflake uses `mcp-snowflake-server` (community package by `allends`) — no Snowflake-official package exists on PyPI. Microsoft, Azure DevOps, Notion, SQLite, Jira, GitLab all use first-party servers from their respective vendors.
 
 | Agent | Config | Package / endpoint | Secrets needed |
 |---|---|---|---|
 | mail-agent | `mail/outlook.json` | `@microsoft/workiq` (Microsoft) | none in MCP config — uses cached device-code auth (run `npx -y @microsoft/workiq accept-eula` then `ask -q "hello"` once before first use) |
-| project-agent | `vcs/github.json` | `@modelcontextprotocol/server-github` | `COPILOT_VCS_TOKEN` |
+| project-agent | `vcs/github.json` | GitHub MCP server (remote HTTP — `https://api.githubcopilot.com/mcp/`, no install) | `COPILOT_VCS_TOKEN` (GitHub PAT) |
 | project-agent | `vcs/gitlab.json` | `@modelcontextprotocol/server-gitlab` | `COPILOT_VCS_TOKEN` |
 | project-agent | `vcs/jira.json` | Atlassian remote MCP (HTTPS at `mcp.atlassian.com/v1/mcp/authv2`, no install for cloud clients; IDEs need `mcp-remote` Node proxy) | `COPILOT_VCS_TOKEN` (Atlassian API token) |
 | data-agent | `database/postgres.json` | `@modelcontextprotocol/server-postgres` | `COPILOT_DB_CONNECTION_STRING` |
 | data-agent | `database/sqlite.json` | `uvx mcp-server-sqlite` (Anthropic) | path to `.db` file — no secret |
 | data-agent | `database/mssql.json` | `@azure/mcp` (Microsoft) | `AZURE_SUBSCRIPTION_ID`, `AZURE_RESOURCE_GROUP` |
 | data-agent | `database/snowflake.json` | `uvx mcp_snowflake_server` (community package by `allends`; no Snowflake-official PyPI package as of May 2026) | `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USER`, `SNOWFLAKE_PASSWORD`, `SNOWFLAKE_DATABASE`, `SNOWFLAKE_WAREHOUSE` |
-| devops-agent | `cicd/github-actions.json` | `@modelcontextprotocol/server-github` | `COPILOT_CICD_TOKEN` |
+| devops-agent | `cicd/github-actions.json` | GitHub MCP server (remote HTTP — same endpoint as above) | `COPILOT_CICD_TOKEN` (GitHub PAT with `workflow` scope) |
 | devops-agent | `cicd/gitlab-ci.json` | `@modelcontextprotocol/server-gitlab` | `COPILOT_CICD_TOKEN` |
 | devops-agent | `cicd/azure-devops.json` | `@azure-devops/mcp` (Microsoft) | `COPILOT_CICD_ORG`, `COPILOT_CICD_TOKEN` |
 | workspace-agent | `workspace/m365.json` | `@microsoft/workiq` (Microsoft) | none in MCP config — uses cached device-code auth (see mail-agent row) |

@@ -1,16 +1,12 @@
 {
   "vcs-mcp": {
-    "type": "local",
-    "command": "npx",
-    "args": [
-      "-y",
-      "@modelcontextprotocol/server-github"
-    ],
+    "type": "http",
+    "url": "https://api.githubcopilot.com/mcp/",
+    "headers": {
+      "Authorization": "Bearer ${{ secrets.COPILOT_VCS_TOKEN }}"
+    },
     "tools": [
       "*"
-    ],
-    "env": {
-      "GITHUB_TOKEN": "${{ secrets.COPILOT_VCS_TOKEN }}"
-    }
+    ]
   }
 }
