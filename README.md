@@ -39,6 +39,21 @@ Each agent separates two things:
 
 Pick a config from `mcp-examples/`, paste it into the agent's `mcp-servers:` block, set your secrets, done. See [SETUP.md](SETUP.md) for the full walkthrough.
 
+## What ships pre-wired
+
+Out of the box, after install + auth for any agents you use, these work with **zero further config**:
+
+| Agent | Backend | What you need |
+|---|---|---|
+| research-agent | built-in web/GitHub search | nothing |
+| project-agent | Copilot CLI's built-in GitHub MCP | nothing (uses your Copilot session auth) |
+| devops-agent | built-in GitHub MCP + shell | nothing |
+| mail-agent | `@microsoft/workiq` (M365 Outlook) | M365 sign-in (one-time `npx -y @microsoft/workiq accept-eula` + `ask -q "hello"`) |
+| workspace-agent | `@microsoft/workiq` (M365 Teams/SharePoint/OneDrive) | same M365 sign-in |
+| data-agent | none (DB path/creds vary) | Edit agent file with your DB path — examples in `mcp-examples/database/` |
+
+To swap a default (e.g. GitLab instead of GitHub, Snowflake for data-agent), drop a different config from `mcp-examples/` into the agent's `mcp-servers:` block.
+
 ## Tool scoping — enforced, not instructed
 
 Most agent setups rely on a prompt saying "only use relevant tools." That's a suggestion. This repo uses the `tools:` array in frontmatter — the platform enforces it. `devops-agent` cannot call mail MCP tools because they're not in its list. Each agent only loads the MCP servers declared in its own file.

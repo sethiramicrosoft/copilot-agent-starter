@@ -24,25 +24,39 @@ cp -r copilot-agent-starter/agents ~/.copilot/
 
 ---
 
-## Step 2 — Verify it works before touching anything else
+## Step 2 — Authenticate (one-time, only for agents you'll use)
 
-Two agents work with zero configuration. Test these first:
+### GitHub (project-agent, devops-agent)
+
+**Nothing to do** — both agents use Copilot CLI's built-in GitHub MCP, which authenticates with your active Copilot session. Just run them.
+
+### Microsoft 365 (mail-agent, workspace-agent)
+
+```powershell
+# 1. Accept the workiq EULA
+npx -y @microsoft/workiq accept-eula
+
+# 2. Trigger device-code sign-in (caches your account in Windows Credential Manager)
+npx -y @microsoft/workiq ask -q "hello"
+```
+
+The second command prints a device code, opens your browser, you sign in with your work/school Microsoft account → done.
+
+### Verify
 
 ```
-# No credentials needed — uses built-in web + GitHub search
 copilot --agent research-agent -p "What is the latest stable version of Node.js?" --allow-all-urls
-
-# No credentials needed — uses shell + built-in GitHub MCP
-copilot --agent devops-agent -p "List the open GitHub Actions workflows in this repo" --allow-all
+copilot --agent project-agent -p "List the 5 most recent issues in sethiramicrosoft/copilot-agent-starter" --allow-all
+copilot --agent mail-agent -p "What are the subjects of my 3 most recent emails?" --allow-all
 ```
 
-If both respond, your install is good. Move to Step 3 only when you're ready to connect a specific tool.
+If all three respond, your install is good. Move to Step 3 only if you want to swap a default (e.g. use GitLab instead of GitHub) or wire data-agent to your database.
 
 ---
 
-## Step 3 — Wire an MCP (optional, per agent)
+## Step 3 — Swap or add an MCP (optional)
 
-Each agent ships without MCP configured so it loads immediately. When you want to connect a real backend, open the agent file and add the `mcp-servers:` block from the matching example in `mcp-examples/`.
+The shipped agents are pre-wired with sensible defaults (M365 for mail/workspace, GitHub for project/devops). To swap, replace the `mcp-servers:` block with a different one from `mcp-examples/`. To wire `data-agent`, follow the example below.
 
 ### How to add MCP to an agent
 

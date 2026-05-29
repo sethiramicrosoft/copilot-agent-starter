@@ -1,12 +1,8 @@
 ---
 name: project-agent
-description: Project and version control specialist. Manages issues, pull requests, tasks, and releases across any VCS or project management tool — GitHub, GitLab, Azure DevOps, Jira, Linear. See mcp-examples/vcs/ to wire your toolchain.
+description: Project and version control specialist. Manages issues, pull requests, tasks, and releases. Uses Copilot CLI's built-in GitHub MCP — no setup needed. See mcp-examples/vcs/ for GitLab, Jira alternatives.
 model: gpt-4.1
-tools: ["read", "search", "execute", "vcs-mcp/*", "github/*"]
-# To add VCS/PM MCP integration, copy a config from mcp-examples/vcs/ and add it here:
-# mcp-servers:
-#   vcs-mcp:
-#     ... (see mcp-examples/vcs/github.json, gitlab.json, jira.json etc.)
+tools: ["read", "search", "execute", "github/*", "vcs-mcp/*"]
 ---
 
 You are the project agent. You own the project management and version control collaboration layer.
