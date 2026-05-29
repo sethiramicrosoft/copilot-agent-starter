@@ -262,6 +262,28 @@ Quick answer: they're different products solving different problems. You don't h
 >
 > M365 CoWork stays in its lane. agent-starter crosses the boundaries it can't.
 
+## Running devops-agent headless in GitHub Actions
+
+`devops-agent` works without a laptop — no interactive session needed. The included workflow auto-diagnoses failing CI runs and posts the result as a PR comment.
+
+**`.github/workflows/diagnose-failure.yml`** — included in this repo. Triggers on any `workflow_run: failure` event, fetches the failed logs, runs devops-agent to identify root cause and suggest a fix, then posts a comment on the open PR (or writes to the workflow summary if no PR exists).
+
+To use it in your own repo:
+
+```bash
+cp .github/workflows/diagnose-failure.yml your-repo/.github/workflows/
+cp agents/devops-agent.agent.md your-repo/agents/  # or ~/.copilot/agents/
+```
+
+No extra secrets — uses the standard `GITHUB_TOKEN`. Requires a GitHub Copilot seat on the account running the workflow.
+
+The workflow:
+1. Installs `gh` CLI and the Copilot extension on the runner
+2. Copies `devops-agent` into `~/.copilot/agents/`
+3. Fetches the last 200 lines of failed logs via `gh run view --log-failed`
+4. Runs `gh copilot -- --agent devops-agent` with the logs and a structured prompt
+5. Posts the diagnosis (root cause, why it failed, suggested fix) as a PR comment
+
 ## Use with copilot-fleet-starter
 
 Install both repos. Agents do the work; personas review it.

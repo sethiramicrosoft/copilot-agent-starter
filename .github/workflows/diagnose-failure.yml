@@ -1,0 +1,133 @@
+# Diagnose a failing CI workflow automatically using devops-agent.
+#
+# Triggers when any workflow in this repo completes with a failure.
+# devops-agent fetches the failed run logs, identifies the root cause,
+# and posts a diagnosis as a comment on the most recent open PR
+# (or as a workflow summary if no PR is open).
+#
+# Requirements:
+#   - GitHub Copilot CLI installed on the runner (see setup step below)
+#   - GITHUB_TOKEN has write access to issues/PRs (default for Actions)
+#   - Your repo has a Copilot seat (any paid plan)
+#
+# No extra secrets needed beyond the standard GITHUB_TOKEN.
+
+name: Diagnose failing workflow
+
+on:
+  workflow_run:
+    workflows: ["*"]
+    types: [completed]
+
+jobs:
+  diagnose:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install GitHub CLI and Copilot extension
+        run: |
+          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+            | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) \
+            signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] \
+            https://cli.github.com/packages stable main" \
+            | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt update && sudo apt install gh -y
+          gh extension install github/gh-copilot
+
+      - name: Copy agents to ~/.copilot
+        run: |
+          mkdir -p ~/.copilot/agents
+          cp agents/devops-agent.agent.md ~/.copilot/agents/
+
+      - name: Fetch failed run details
+        id: run_info
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RUN_ID="${{ github.event.workflow_run.id }}"
+          WORKFLOW_NAME="${{ github.event.workflow_run.name }}"
+          RUN_URL="${{ github.event.workflow_run.html_url }}"
+          HEAD_SHA="${{ github.event.workflow_run.head_sha }}"
+
+          # Fetch last 200 lines of logs from the failed run
+          LOGS=$(gh run view "$RUN_ID" --log-failed --repo "${{ github.repository }}" 2>&1 | tail -200 || echo "Could not fetch logs")
+
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          echo "workflow_name=$WORKFLOW_NAME" >> $GITHUB_OUTPUT
+          echo "run_url=$RUN_URL" >> $GITHUB_OUTPUT
+          echo "head_sha=$HEAD_SHA" >> $GITHUB_OUTPUT
+
+          # Write logs to file (avoids env var size limits)
+          echo "$LOGS" > /tmp/failed_logs.txt
+
+      - name: Run devops-agent diagnosis
+        id: diagnosis
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LOGS=$(cat /tmp/failed_logs.txt)
+          PROMPT="The CI workflow '${{ steps.run_info.outputs.workflow_name }}' failed on commit ${{ steps.run_info.outputs.head_sha }}.
+
+          Run URL: ${{ steps.run_info.outputs.run_url }}
+
+          Failed log output (last 200 lines):
+          ---
+          $LOGS
+          ---
+
+          Diagnose the root cause. Be specific: identify the failing step, the exact error, and explain why it failed. Then suggest the most likely fix. Keep the response concise — 3 sections max: Root Cause, Why It Failed, Suggested Fix."
+
+          RESULT=$(gh copilot -- --agent devops-agent -p "$PROMPT" --allow-all 2>&1)
+          echo "$RESULT" > /tmp/diagnosis.txt
+          echo "Diagnosis complete"
+
+      - name: Find open PR for this commit
+        id: find_pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SHA="${{ steps.run_info.outputs.head_sha }}"
+          PR_NUMBER=$(gh pr list --repo "${{ github.repository }}" --state open \
+            --json number,headRefOid \
+            --jq ".[] | select(.headRefOid == \"$SHA\") | .number" | head -1)
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Post diagnosis as PR comment
+        if: ${{ steps.find_pr.outputs.pr_number != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DIAGNOSIS=$(cat /tmp/diagnosis.txt)
+          BODY="## CI Diagnosis — ${{ steps.run_info.outputs.workflow_name }}
+
+          **Failed run:** ${{ steps.run_info.outputs.run_url }}
+          **Commit:** \`${{ steps.run_info.outputs.head_sha }}\`
+
+          $DIAGNOSIS
+
+          ---
+          *Diagnosed by [devops-agent](https://github.com/sethiramicrosoft/copilot-agent-starter)*"
+
+          gh pr comment "${{ steps.find_pr.outputs.pr_number }}" \
+            --repo "${{ github.repository }}" \
+            --body "$BODY"
+
+      - name: Write diagnosis to workflow summary (no open PR)
+        if: ${{ steps.find_pr.outputs.pr_number == '' }}
+        run: |
+          DIAGNOSIS=$(cat /tmp/diagnosis.txt)
+          echo "## CI Diagnosis — ${{ steps.run_info.outputs.workflow_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Failed run:** ${{ steps.run_info.outputs.run_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "$DIAGNOSIS" >> $GITHUB_STEP_SUMMARY
