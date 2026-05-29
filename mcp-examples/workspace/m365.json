@@ -2,11 +2,11 @@
   "workspace-mcp": {
     "type": "stdio",
     "command": "npx",
-    "args": ["-y", "@microsoft/mcp-server-msgraph"],
+    "args": ["-y", "@microsoft/workiq"],
     "env": {
-      "GRAPH_CLIENT_ID": "${{ secrets.COPILOT_WORKSPACE_CLIENT_ID }}",
-      "GRAPH_CLIENT_SECRET": "${{ secrets.COPILOT_WORKSPACE_CLIENT_SECRET }}",
-      "GRAPH_TENANT_ID": "${{ secrets.COPILOT_WORKSPACE_TENANT_ID }}"
+      "WORKIQ_CLIENT_ID": "${{ secrets.COPILOT_WORKSPACE_CLIENT_ID }}",
+      "WORKIQ_CLIENT_SECRET": "${{ secrets.COPILOT_WORKSPACE_CLIENT_SECRET }}",
+      "WORKIQ_TENANT_ID": "${{ secrets.COPILOT_WORKSPACE_TENANT_ID }}"
     }
   }
 }

@@ -2,9 +2,10 @@
   "db-mcp": {
     "type": "stdio",
     "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-mssql"],
+    "args": ["-y", "@azure/mcp"],
     "env": {
-      "MSSQL_CONNECTION_STRING": "${{ secrets.COPILOT_DB_CONNECTION_STRING }}"
+      "AZURE_SUBSCRIPTION_ID": "${{ secrets.AZURE_SUBSCRIPTION_ID }}",
+      "AZURE_RESOURCE_GROUP": "${{ secrets.AZURE_RESOURCE_GROUP }}"
     }
   }
 }

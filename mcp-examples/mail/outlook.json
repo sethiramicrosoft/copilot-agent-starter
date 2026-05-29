@@ -2,11 +2,11 @@
   "mail-mcp": {
     "type": "stdio",
     "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-outlook"],
+    "args": ["-y", "@microsoft/workiq"],
     "env": {
-      "OUTLOOK_CLIENT_ID": "${{ secrets.COPILOT_MAIL_CLIENT_ID }}",
-      "OUTLOOK_CLIENT_SECRET": "${{ secrets.COPILOT_MAIL_CLIENT_SECRET }}",
-      "OUTLOOK_TENANT_ID": "${{ secrets.COPILOT_MAIL_TENANT_ID }}"
+      "WORKIQ_CLIENT_ID": "${{ secrets.COPILOT_MAIL_CLIENT_ID }}",
+      "WORKIQ_CLIENT_SECRET": "${{ secrets.COPILOT_MAIL_CLIENT_SECRET }}",
+      "WORKIQ_TENANT_ID": "${{ secrets.COPILOT_MAIL_TENANT_ID }}"
     }
   }
 }
