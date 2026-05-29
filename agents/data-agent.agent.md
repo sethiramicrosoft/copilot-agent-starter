@@ -2,22 +2,11 @@
 name: data-agent
 description: Data analysis specialist. Queries databases, analyses files (CSV, JSON, Parquet), produces summaries and visualisations. Works with any database via MCP or shell fallback. See mcp-examples/database/ to wire your stack.
 model: claude-opus-4.7
-tools: ["read", "search", "execute", "db-mcp/query", "db-mcp/list_tables", "db-mcp/describe_table", "db-mcp/explain_query"]
-mcp-servers:
-  db-mcp:
-    type: stdio
-    command: npx
-    args: ["-y", "YOUR_DATABASE_MCP_PACKAGE"]
-    # See mcp-examples/database/ for provider-specific configs:
-    # SQLite    → mcp-examples/database/sqlite.json
-    # Postgres  → mcp-examples/database/postgres.json
-    # MySQL     → mcp-examples/database/mysql.json
-    # SQL Server→ mcp-examples/database/mssql.json
-    # Snowflake → mcp-examples/database/snowflake.json
-    # BigQuery  → mcp-examples/database/bigquery.json
-    # No MCP?   → agent falls back to execute (shell) + sql cli tools
-    env:
-      DB_CONNECTION_STRING: ${{ secrets.COPILOT_DB_CONNECTION_STRING }}
+tools: ["read", "search", "execute"]
+# To add database MCP integration, copy a config from mcp-examples/database/ and add it here:
+# mcp-servers:
+#   db-mcp:
+#     ... (see mcp-examples/database/postgres.json, sqlite.json etc.)
 ---
 
 You are the data agent. You turn raw data into answers.

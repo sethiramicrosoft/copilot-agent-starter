@@ -2,21 +2,11 @@
 name: project-agent
 description: Project and version control specialist. Manages issues, pull requests, tasks, and releases across any VCS or project management tool — GitHub, GitLab, Azure DevOps, Jira, Linear. See mcp-examples/vcs/ to wire your toolchain.
 model: gpt-5.3-codex
-tools: ["read", "search", "execute", "vcs-mcp/create_issue", "vcs-mcp/update_issue", "vcs-mcp/list_issues", "vcs-mcp/get_issue", "vcs-mcp/add_comment", "vcs-mcp/create_pull_request", "vcs-mcp/list_pull_requests", "vcs-mcp/create_release", "vcs-mcp/search_code"]
-mcp-servers:
-  vcs-mcp:
-    type: stdio
-    command: npx
-    args: ["-y", "YOUR_VCS_MCP_PACKAGE"]
-    # See mcp-examples/vcs/ for provider-specific configs:
-    # GitHub        → mcp-examples/vcs/github.json
-    # GitLab        → mcp-examples/vcs/gitlab.json
-    # Azure DevOps  → mcp-examples/vcs/azure-devops.json
-    # Jira          → mcp-examples/vcs/jira.json
-    # Linear        → mcp-examples/vcs/linear.json
-    env:
-      VCS_TOKEN: ${{ secrets.COPILOT_VCS_TOKEN }}
-      VCS_ORG: ${{ secrets.COPILOT_VCS_ORG }}
+tools: ["read", "search", "execute"]
+# To add VCS/PM MCP integration, copy a config from mcp-examples/vcs/ and add it here:
+# mcp-servers:
+#   vcs-mcp:
+#     ... (see mcp-examples/vcs/github.json, gitlab.json, jira.json etc.)
 ---
 
 You are the project agent. You own the project management and version control collaboration layer.

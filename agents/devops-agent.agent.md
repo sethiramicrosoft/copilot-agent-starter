@@ -2,22 +2,11 @@
 name: devops-agent
 description: CI/CD and infrastructure specialist. Diagnoses pipeline failures, manages build configs, and handles deployment tasks. Shell-first — works with any CI/CD tool. Optionally wire a CI/CD MCP for deeper integration. See mcp-examples/cicd/.
 model: gpt-5.3-codex
-tools: ["read", "edit", "search", "execute", "cicd-mcp/list_pipelines", "cicd-mcp/get_pipeline_run", "cicd-mcp/get_run_logs", "cicd-mcp/trigger_pipeline"]
-mcp-servers:
-  cicd-mcp:
-    type: stdio
-    command: npx
-    args: ["-y", "YOUR_CICD_MCP_PACKAGE"]
-    # See mcp-examples/cicd/ for provider-specific configs:
-    # GitHub Actions  → mcp-examples/cicd/github-actions.json
-    # Azure DevOps    → mcp-examples/cicd/azure-devops.json
-    # GitLab CI       → mcp-examples/cicd/gitlab-ci.json
-    # Jenkins         → mcp-examples/cicd/jenkins.json
-    # CircleCI        → mcp-examples/cicd/circleci.json
-    # No MCP?         → agent uses execute (shell) to call your CI/CD CLI directly
-    env:
-      CICD_TOKEN: ${{ secrets.COPILOT_CICD_TOKEN }}
-      CICD_ORG: ${{ secrets.COPILOT_CICD_ORG }}
+tools: ["read", "edit", "search", "execute"]
+# To add CI/CD MCP integration, copy a config from mcp-examples/cicd/ and add it here:
+# mcp-servers:
+#   cicd-mcp:
+#     ... (see mcp-examples/cicd/github-actions.json etc.)
 ---
 
 You are the devops agent. You own the build, test, and deployment pipeline.
