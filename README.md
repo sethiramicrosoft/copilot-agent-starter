@@ -1,6 +1,8 @@
 # copilot-agent-starter
 
-A vendor-agnostic reference setup for **domain-scoped agents** on GitHub Copilot CLI. Each agent owns a domain, pins its own model, and wires its own MCP servers. Swap the MCP config for your stack — the agent behaviour stays the same.
+Six domain agents for GitHub Copilot CLI. Each one owns a specific job, scopes its own tools, and wires to whatever backend you already use via MCP. You swap the MCP config — the agent behaviour doesn't change.
+
+No extra subscriptions. Works with whatever GitHub Copilot plan you already have.
 
 Companion to [copilot-fleet-starter](https://github.com/sethiramicrosoft/copilot-fleet-starter) — the code review persona fleet. This repo does the work; that repo reviews it.
 
@@ -26,14 +28,16 @@ mcp-examples/
 └── vcs/        → github.json, gitlab.json, jira.json
 ```
 
-## Why vendor-agnostic?
+## Why this exists
 
-Each `.agent.md` separates two things:
+If you only have GitHub Copilot CLI — no M365 Copilot CoWork, no Claude Cowork — you can still get domain-specific agents for your day-to-day work. This repo gives you a ready-made starting point so you're not reading docs and figuring out YAML formats from scratch.
 
-1. **Behaviour** — what the agent does, how it behaves, what it ignores. Never changes regardless of your stack.
+Each agent separates two things:
+
+1. **Behaviour** — what the agent does, how it thinks, what it won't touch. Never changes.
 2. **MCP config** — which external tool it connects to. The only thing you swap.
 
-Pick your configs from `mcp-examples/`, paste into the agent's `mcp-servers:` block, set secrets, done. See [SETUP.md](SETUP.md) for the full walkthrough.
+Pick a config from `mcp-examples/`, paste it into the agent's `mcp-servers:` block, set your secrets, done. See [SETUP.md](SETUP.md) for the full walkthrough.
 
 ## Install (2 minutes)
 
@@ -52,6 +56,8 @@ cp copilot-agent-starter/copilot-instructions.md ~/.copilot/
 cp copilot-agent-starter/AGENTS.md ~/.copilot/
 cp -r copilot-agent-starter/agents ~/.copilot/
 ```
+
+Then pick your MCP configs from `mcp-examples/` and set secrets — see [Configuring secrets](#configuring-secrets).
 
 ## Usage
 
@@ -141,85 +147,77 @@ copilot --agent=research-agent --prompt "..."  ← CLI flag for one-shot tasks
 
 See [SETUP.md](SETUP.md) for role-by-role examples with full prompts.
 
-## How this compares to M365 Copilot CoWork and Claude CoWork
+## How this fits with M365 Copilot CoWork and Claude Cowork
 
-These products solve genuinely different problems. Here is an honest, grounded comparison.
+Quick answer: they're different products solving different problems. You don't have to choose.
 
-### What each product actually is
+### What each product does
 
-**M365 Copilot CoWork** (Microsoft, preview as of May 2026, $30–99/user/month add-on):
-- Cloud execution — no laptop required, no desktop app
-- Work IQ layer: semantic org index across M365 + Dynamics + external data via federated MCP connectors
-- Work IQ CLI brings M365 org context into developer environments via MCP
-- Multi-model internally (Microsoft controls routing — you do not choose)
-- Scoped to Microsoft ecosystem: SharePoint, Teams, Outlook, Dynamics, M365 Graph
-- 13 built-in skills + 20 Frontier preview skills
+**M365 Copilot CoWork** (Microsoft, Frontier preview May 2026, $30–99/user/month on top of M365):
+- Runs in the cloud — no desktop app needed
+- Has Work IQ underneath: a semantic index of your org's M365 data, org graph, Dynamics, and external data via federated MCP connectors
+- Work IQ CLI lets developers pull M365 org context into their own tools
+- Microsoft controls model routing — you don't pick
+- Native to M365 ecosystem; 3rd party tools available via MCP connectors (Frontier preview, requires admin setup)
 
-**Claude CoWork** (Anthropic, May 2026):
-- Desktop execution — laptop must be on and running
-- Computer use: opens apps, navigates browser, fills spreadsheets, organises local files
-- Plugin marketplace: Slack, Notion, GitHub, Jira, Zapier, CRM connectors
-- Scheduled recurring tasks (laptop-bound)
-- Claude model only — no model switching
-- Positioned at knowledge workers and non-technical users
-- Requires Claude for Work subscription (separate cost from any GHCP license)
+**Claude Cowork** (Anthropic, 2026, requires a paid Claude plan):
+- Runs on your desktop — your laptop has to be on and the app open
+- Computer use: can open apps, navigate browsers, fill spreadsheets, organise local files
+- Plugin marketplace with Slack, Notion, GitHub, Jira, Zapier and more
+- Scheduled tasks — but only while your computer is awake
+- Claude model only, no model switching
+- Built for knowledge workers, not developers specifically
 
-**This fleet** (GHCP CLI agents + persona fleet, included in your existing GitHub Copilot subscription):
-- Runs in terminal, CI/CD runners, containers, headless — anywhere the CLI runs
-- Platform-enforced tool and MCP scoping per agent (YAML frontmatter, not just instructions)
-- Multi-model: each agent/persona pins the model best suited to its job
-- Vendor-neutral: GitHub, GitLab, Jira, ADO, Postgres, Snowflake, Slack, M365, Notion, and more
-- Review artifacts written as git-tracked markdown files (`reviews/<ticket>-<persona>.md`)
-- Persistent lessons baked back into persona files between sessions
+**copilot-agent-starter** (runs on your existing GitHub Copilot subscription):
+- Runs anywhere the CLI runs — terminal, GitHub Actions, CI runners, containers
+- Each agent has platform-enforced tool scoping (`tools:` array, not just instructions)
+- Each agent scopes its own MCP servers — devops-agent can't reach mail MCP
+- Works with GitHub, GitLab, Jira, Postgres, Snowflake, Slack, M365, Notion — whatever you already use
+- No second vendor contract
 
 ### Feature comparison
 
-| | M365 CoWork | Claude CoWork | This fleet |
+| | M365 CoWork | Claude Cowork | agent-starter |
 |---|---|---|---|
-| **Runs without a laptop** | ✅ cloud | ❌ desktop-bound | ✅ CI / server / headless |
-| **Works outside Microsoft stack** | ❌ M365 only | ✅ plugins | ✅ any MCP server |
-| **Multi-model per task** | ❌ Microsoft routes | ❌ Claude only | ✅ per-agent pinned |
-| **Platform-enforced tool scoping** | ✅ | ❌ plugin OAuth | ✅ YAML `tools:` array |
-| **Auditable git-tracked artifacts** | ❌ | ❌ | ✅ markdown in repo |
-| **Can gate CI/CD pipelines** | ❌ | ❌ | ✅ |
+| **Runs without a laptop** | ✅ cloud | ❌ laptop must be on | ✅ CI / headless / anywhere |
+| **Works outside Microsoft stack** | ⚠️ 3rd party via MCP (Frontier preview, admin setup) | ✅ plugins | ✅ any MCP server |
+| **You control model per agent** | ❌ Microsoft routes | ❌ Claude only | ✅ per-agent in YAML |
+| **Platform-enforced tool scoping** | ✅ | ❌ plugin OAuth | ✅ `tools:` array |
+| **Runs in GitHub Actions** | ❌ | ❌ | ✅ documented |
 | **Can query a database** | limited | ❌ | ✅ via MCP |
-| **Adversarial parallel review** | ❌ | ❌ | ✅ `/fleet` |
-| **No extra subscription cost** | ❌ add-on | ❌ separate license | ✅ in GHCP |
-| **Org semantic index / graph** | ✅ Work IQ | ❌ | ❌ |
-| **Computer use (open apps, browser)** | ❌ | ✅ | ❌ |
+| **No extra subscription** | ❌ $30–99/mo add-on | ❌ separate paid plan | ✅ uses your GHCP seat |
+| **Org semantic index** | ✅ Work IQ | ❌ | ❌ |
+| **Computer use (apps, browser)** | ❌ | ✅ | ❌ |
 | **Non-technical user UX** | ✅ | ✅ | ❌ CLI only |
 
 ### When to use which
 
-**Use M365 CoWork when:** your team lives in M365, you want cloud-native org-wide memory (semantic index, collaboration graph, Dynamics data), and you need skills that work without developer involvement.
+**M365 CoWork** — your org is deep in M365 and you want cloud-native org intelligence (who owns what, collaboration patterns, Dynamics data). Great for knowledge workers who don't want to touch a terminal.
 
-**Use Claude CoWork when:** you need computer use (browser automation, spreadsheet filling, local file organisation) or recurring scheduled tasks driven by a desktop agent. Strong for non-technical knowledge workers on non-M365 stacks.
+**Claude Cowork** — you need computer use (browser automation, local file work, spreadsheets) or recurring tasks that run from a desktop. Strong for non-technical users not on M365.
 
-**Use this fleet when:**
-- You need multi-model adversarial code review (10 specialist reviewers in parallel, each on the best-fit model)
-- CI/CD integration — running as a pre-merge gate, on ephemeral runners, without a laptop
-- Platform-enforced least-privilege scoping per agent (required for regulated environments)
-- Your team is on GitLab, Jira, Snowflake, Slack, Notion, or any non-M365/non-Anthropic stack
-- You already have GHCP and cannot justify a second vendor contract
-- You want review artifacts as version-controlled files attached to PRs, not chat transcripts
+**agent-starter** — you have GHCP and want domain agents for your actual dev workflow. Especially useful if:
+- You're on GitLab, Jira, Snowflake, or anything outside Microsoft's ecosystem
+- You need agents that run in CI without a laptop
+- You don't want to pay for another platform subscription
+- You want tool boundaries enforced at the platform level, not just by prompt
 
-### Honest limitations of this fleet
+### What it doesn't do
 
-- CLI only — non-technical stakeholders (PMs, execs) face a steeper learning curve than CoWork products
-- No org-wide semantic index — Work IQ's relationship graph and Dynamics integration are genuinely better for org-level intelligence
-- MCP server ecosystem is uneven in practice — some connectors are half-maintained or lack full auth flows
-- 10 parallel persona reviews can generate review fatigue if teams don't triage the output
-- Dependent on GHCP CLI's continued development roadmap
+- No org-wide semantic index like Work IQ — it doesn't know your org's collaboration graph
+- CLI only — non-technical teammates won't find it friendly
+- Mail and workspace agents need OAuth app registration — not hard, but not instant either
+- Model inference goes through GitHub Copilot's endpoints — it's not air-gapped
+- Heavy usage may hit premium request limits on your Copilot plan
 
-### Concrete example of complementary use
+### Complementary use example
 
-> 1. **M365 CoWork** surfaces a project risk using the Work IQ org graph (inside M365)
+> 1. **M365 CoWork** surfaces a risk in the Work IQ org graph
 > 2. **workspace-agent** pulls the meeting notes and extracts action items
 > 3. **project-agent** creates issues in Jira or GitHub
 > 4. **devops-agent** checks if the related CI pipeline is green
-> 5. **`/fleet`** runs 10 parallel reviews on the fix before merge
 >
-> M365 CoWork found the signal. This fleet acted on it across every boundary it cannot cross.
+> M365 CoWork stays in its lane. agent-starter crosses the boundaries it can't.
 
 ## Use with copilot-fleet-starter
 
@@ -228,13 +226,13 @@ Install both repos. Agents do the work; personas review it.
 ```
 1. research-agent   → research the approach
 2. Main session     → build it
-3. /fleet personas  → security, performance, UX, accessibility reviewed in parallel
-4. project-agent    → open the PR
-5. devops-agent     → diagnose CI if it fails
-6. workspace-agent  → post the release summary to the team channel
+3. project-agent    → open the PR
+4. devops-agent     → diagnose CI if it fails
+5. workspace-agent  → post the release summary to the team channel
+6. /fleet personas  → optional: run security, perf, UX review in parallel before merge
 ```
 
-The persona fleet from [copilot-fleet-starter](https://github.com/sethiramicrosoft/copilot-fleet-starter) dispatches 10 specialist reviewers in parallel via `/fleet` — each on the model best suited to its role (Opus for architecture, Codex for security, Haiku for readability). These two repos run on the same CLI and complement each other.
+The persona fleet from [copilot-fleet-starter](https://github.com/sethiramicrosoft/copilot-fleet-starter) dispatches 10 specialist reviewers via `/fleet` — each pinned to the model best suited to its role. Both repos run on the same CLI.
 
 ## What makes this different from personas
 
@@ -242,11 +240,13 @@ The persona fleet from [copilot-fleet-starter](https://github.com/sethiramicroso
 |---|---|
 | `~/.copilot/personas/*.md` | `~/.copilot/agents/*.agent.md` |
 | Plain markdown | YAML frontmatter + markdown |
-| Model pinned via instruction rule | Native `model:` property |
-| Tool use scoped by instructions | Native `tools:` array (platform-enforced) |
+| Model pinned via instruction rule | `model:` property in frontmatter |
+| Tool use scoped by instructions | `tools:` array (platform-enforced) |
 | Shared global MCPs | `mcp-servers:` scoped per agent |
 | Invoked via `/fleet` for parallel review | Invoked via `/agent` or `--agent=` |
 | **Purpose: review code** | **Purpose: do domain work** |
+
+> **Note on `model:`** — honoured in VS Code and interactive CLI. If you're using cloud agent (GitHub Actions), verify it's respected in your GHCP plan.
 
 ## Adding your own agents
 
@@ -261,6 +261,7 @@ Copy any `.agent.md`, update the frontmatter and instructions, drop it in `~/.co
 
 - [Custom agents configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
 - [Creating custom agents](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/create-custom-agents)
+- [Automate Copilot CLI with GitHub Actions](https://docs.github.com/en/copilot/how-tos/copilot-cli/automate-copilot-cli/automate-with-actions)
 - [copilot-fleet-starter](https://github.com/sethiramicrosoft/copilot-fleet-starter)
 
 ## License
