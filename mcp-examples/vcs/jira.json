@@ -1,7 +1,7 @@
 {
   "vcs-mcp": {
     "type": "http",
-    "url": "https://mcp.atlassian.com/v1/mcp",
+    "url": "https://mcp.atlassian.com/v1/mcp/authv2",
     "headers": {
       "Authorization": "Bearer ${{ secrets.COPILOT_VCS_TOKEN }}"
     }

@@ -3,7 +3,7 @@
     "type": "local",
     "command": "uvx",
     "args": [
-      "mcp-server-snowflake"
+      "mcp_snowflake_server"
     ],
     "tools": [
       "*"

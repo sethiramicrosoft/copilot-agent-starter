@@ -58,6 +58,8 @@ The boundary is verifiable and diffable in version control.
 
 ## Install (2 minutes)
 
+> **Note on the CLI binary** — The official GitHub Copilot CLI is the standalone `copilot` binary, installed via `npm install -g @github/copilot` (see [docs](https://docs.github.com/en/copilot/how-tos/copilot-cli/set-up-copilot-cli/install-copilot-cli)). The examples below use `gh copilot --` (which works if you have the GitHub CLI Copilot extension installed); substitute `copilot` if you're on the standalone install. The flags after `--` are identical.
+
 ```powershell
 # Windows
 git clone https://github.com/sethiramicrosoft/copilot-agent-starter.git
@@ -163,22 +165,29 @@ gh copilot -- --agent research-agent -p "Find production-grade reference impleme
 
 ## Configuring secrets
 
-All MCP configs use official vendor packages only — no community packages. Each config ships in `mcp-examples/` ready to copy into the agent's `mcp-servers:` block. See [SETUP.md](SETUP.md) for how.
+All MCP configs ship in `mcp-examples/` ready to copy into the agent's `mcp-servers:` block. See [SETUP.md](SETUP.md) for how.
+
+> ⚠️ **Heads-up on MCP package status (May 2026)**: The official `@modelcontextprotocol/server-{github,gitlab,postgres,slack}` packages are marked **deprecated** (`"Package no longer supported"`) on npm — they still work but are no longer maintained by Anthropic. Recommended replacements:
+> - **GitHub** → [`github/github-mcp-server`](https://github.com/github/github-mcp-server) (GitHub's own MCP server)
+> - **GitLab** → [`gitlab-org/editor-extensions/gitlab-mcp-server`](https://gitlab.com/gitlab-org/editor-extensions/gitlab-mcp-server) (GitLab official)
+> - **Postgres / Slack** → no official first-party replacement yet; community packages exist
+>
+> The `mcp-examples/` configs still reference the deprecated packages so the repo works out of the box — swap when ready.
 
 | Agent | Config | Package / endpoint | Secrets needed |
 |---|---|---|---|
-| mail-agent | `mail/outlook.json` | `@microsoft/workiq` (Microsoft) | `WORKIQ_ACCOUNT` (your email — uses cached device code auth, no app registration) |
+| mail-agent | `mail/outlook.json` | `@microsoft/workiq` (Microsoft) | none in MCP config — uses cached device-code auth (run `npx -y @microsoft/workiq accept-eula` then `ask -q "hello"` once before first use) |
 | project-agent | `vcs/github.json` | `@modelcontextprotocol/server-github` | `COPILOT_VCS_TOKEN` |
 | project-agent | `vcs/gitlab.json` | `@modelcontextprotocol/server-gitlab` | `COPILOT_VCS_TOKEN` |
-| project-agent | `vcs/jira.json` | Atlassian remote MCP (HTTPS, no install) | `COPILOT_VCS_TOKEN` (Atlassian API token) |
+| project-agent | `vcs/jira.json` | Atlassian remote MCP (HTTPS at `mcp.atlassian.com/v1/mcp/authv2`, no install for cloud clients; IDEs need `mcp-remote` Node proxy) | `COPILOT_VCS_TOKEN` (Atlassian API token) |
 | data-agent | `database/postgres.json` | `@modelcontextprotocol/server-postgres` | `COPILOT_DB_CONNECTION_STRING` |
 | data-agent | `database/sqlite.json` | `uvx mcp-server-sqlite` (Anthropic) | path to `.db` file — no secret |
 | data-agent | `database/mssql.json` | `@azure/mcp` (Microsoft) | `AZURE_SUBSCRIPTION_ID`, `AZURE_RESOURCE_GROUP` |
-| data-agent | `database/snowflake.json` | `uvx mcp-server-snowflake` (Snowflake) | `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USER`, `SNOWFLAKE_PASSWORD`, `SNOWFLAKE_DATABASE`, `SNOWFLAKE_WAREHOUSE` |
+| data-agent | `database/snowflake.json` | `uvx mcp_snowflake_server` (community package by `allends`; no Snowflake-official PyPI package as of May 2026) | `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USER`, `SNOWFLAKE_PASSWORD`, `SNOWFLAKE_DATABASE`, `SNOWFLAKE_WAREHOUSE` |
 | devops-agent | `cicd/github-actions.json` | `@modelcontextprotocol/server-github` | `COPILOT_CICD_TOKEN` |
 | devops-agent | `cicd/gitlab-ci.json` | `@modelcontextprotocol/server-gitlab` | `COPILOT_CICD_TOKEN` |
 | devops-agent | `cicd/azure-devops.json` | `@azure-devops/mcp` (Microsoft) | `COPILOT_CICD_ORG`, `COPILOT_CICD_TOKEN` |
-| workspace-agent | `workspace/m365.json` | `@microsoft/workiq` (Microsoft) | `WORKIQ_ACCOUNT` (your email — uses cached device code auth, no app registration) |
+| workspace-agent | `workspace/m365.json` | `@microsoft/workiq` (Microsoft) | none in MCP config — uses cached device-code auth (see mail-agent row) |
 | workspace-agent | `workspace/slack.json` | `@modelcontextprotocol/server-slack` | `COPILOT_WORKSPACE_CLIENT_ID` (bot token), `COPILOT_WORKSPACE_TENANT_ID` (team ID) |
 | workspace-agent | `workspace/notion.json` | `@notionhq/notion-mcp-server` (Notion) | `COPILOT_WORKSPACE_CLIENT_ID` (API key) |
 | research-agent | none needed | built-in web + GitHub search | none |
@@ -214,14 +223,14 @@ Quick answer: they're different products solving different problems. You don't h
 
 ### What each product does
 
-**Microsoft Copilot Cowork** (Microsoft, Research Preview March 2026, $30/user/month on top of M365 Copilot):
+**Microsoft Copilot Cowork** (Microsoft, Research Preview March 2026; included with M365 Copilot via the Frontier program — no separate add-on price published):
 - Runs in the cloud — no desktop app needed
-- Powered by Anthropic's Claude; executes multi-step tasks across M365 apps (Outlook, Teams, Excel, SharePoint)
-- Has Work IQ underneath: a semantic index of your org's M365 data, org graph, Dynamics, and external data via federated MCP connectors
+- Powered by Anthropic's Claude (Opus 4.8 rolling out late May 2026; earlier previews used Opus 4.6/Sonnet 4.6)
+- Has Work IQ underneath: a semantic index of your org's M365 data, org graph, Dynamics, and external data via federated MCP connectors (GA May 5, 2026)
 - Microsoft controls model routing — you don't pick
 - Native to M365 ecosystem; 3rd party tools available via MCP connectors (requires admin setup)
 
-**Microsoft Agent 365** (Microsoft, GA May 2026, $15/user/month standalone or included in M365 E7 at $99/user/month):
+**Microsoft Agent 365** (Microsoft, available in M365 E7 bundle at $99/user/month; standalone pricing not publicly listed):
 - Not an AI agent itself — it's the **governance and control plane** for AI agents inside your Microsoft tenant
 - Lets IT admins observe, govern, and secure both Microsoft and third-party agents
 - Relevant for enterprises that need audit trails and policy controls over agent activity
@@ -229,8 +238,8 @@ Quick answer: they're different products solving different problems. You don't h
 
 **Claude Cowork** (Anthropic, 2026, requires a paid Claude plan):
 - Runs on your desktop — your laptop has to be on and the app open
-- Computer use: can open apps, navigate browsers, fill spreadsheets, organise local files
-- Plugin marketplace with Slack, Notion, GitHub, Jira, Zapier and more
+- Computer use: includes Claude-in-Chrome connector for browser navigation, clicking, form-filling; plus desktop app/spreadsheet/file work
+- Connectors include Slack and Google Drive (built-in web connectors); custom MCP servers for the rest
 - Scheduled tasks — but only while your computer is awake
 - Claude model only, no model switching
 - Built for knowledge workers, not developers specifically
@@ -259,13 +268,13 @@ Quick answer: they're different products solving different problems. You don't h
 |---|---|---|---|---|
 | **Runs without a laptop** | ✅ cloud | ✅ cloud (governance layer) | ❌ laptop must stay on | ❌ interactive needs machine on; devops-agent runs headless in GitHub Actions |
 | **Works outside Microsoft stack** | ❌ M365 apps only (preview) | ⚠️ tenant-bound; partner agents can integrate external services | ✅ plugins (Slack, Notion, GitHub, Google Drive and more) | ✅ any MCP server |
-| **You control model per agent** | ❌ Claude variants only (Sonnet 4.6 or Opus 4.6) | ⚠️ model choice available via Copilot Studio | ❌ Claude only | ✅ per-agent in YAML |
+| **You control model per agent** | ❌ Claude only (currently Opus 4.8; previews used Opus 4.6 / Sonnet 4.6) | ⚠️ model choice available via Copilot Studio | ❌ Claude only | ✅ per-agent in YAML |
 | **Platform-enforced tool scoping** | ✅ tenant permissions + governance | ✅ governance layer | ❌ plugin OAuth consent | ✅ `tools:` array |
 | **Runs in GitHub Actions** | ❌ | ❌ | ❌ | ⚠️ devops-agent yes; project-agent partially |
 | **Can query a database** | ⚠️ M365 data only (Excel, SharePoint) | ⚠️ via connectors/agents | ✅ via Data plugin (Snowflake, BigQuery, Databricks, SQL) | ✅ via MCP |
-| **No extra subscription** | ❌ $30/user/mo (M365 Copilot add-on) | ❌ $15/user/mo standalone; included in E7 ($99/mo bundle) | ❌ separate paid plan | ✅ uses your GHCP seat |
+| **No extra subscription** | ⚠️ included with M365 Copilot via Frontier opt-in | ❌ $99/user/mo E7 bundle (standalone price not published) | ❌ separate paid plan | ✅ uses your GHCP seat |
 | **Org semantic index** | ✅ Work IQ | ✅ via Work IQ | ❌ | ❌ |
-| **Computer use (apps, browser)** | ❌ | ❌ | ⚠️ limited desktop automation (not full browser control) | ❌ |
+| **Computer use (apps, browser)** | ❌ | ❌ | ✅ Claude-in-Chrome connector + desktop apps | ❌ |
 | **Non-technical user UX** | ✅ knowledge worker UX + IT admin controls | ✅ IT admin UX | ✅ | ❌ CLI only |
 
 ### When to use which
@@ -274,7 +283,7 @@ Quick answer: they're different products solving different problems. You don't h
 
 **Agent 365** — your IT/security team needs governance and audit trails over AI agent activity across the tenant. This is an enterprise IT product, not an end-user productivity tool.
 
-**Claude Cowork** — you need computer use (browser automation, local file work, spreadsheets) or recurring tasks that run from a desktop. Strong for non-technical users not on M365.
+**Claude Cowork** — you need Chrome browser automation, desktop-app control, local file work, or recurring tasks that run from a desktop. Strong for non-technical users not on M365.
 
 **agent-starter** — you have GHCP and want domain agents for your actual dev workflow. Especially useful if:
 - You're on GitLab, Jira, Snowflake, or anything outside Microsoft's ecosystem
@@ -367,13 +376,13 @@ No extra subscription needed — runs on your existing GitHub Copilot plan.
 
 GitHub Copilot switched to **usage-based billing** on June 1, 2026. Every agent interaction draws from your plan's monthly **AI Credits** (1 credit = $0.01). Code completions stay free; chat, CLI, and agent use draw credits.
 
-| Plan | Monthly cost | AI Credits included |
+| Plan | Monthly cost | AI Credits / month (base + flex) |
 |---|---|---|
 | Copilot Free | $0 | Very limited — not practical for regular agent use |
-| Copilot Pro | $10/mo | 1,000 credits ($10 value) |
-| Copilot Pro+ | $39/mo | 3,900 credits |
-| Copilot Business | $19/user/mo | 1,900 credits/user |
-| Copilot Enterprise | $39/user/mo | 3,900 credits/user |
+| Copilot Pro | $10/mo | 1,500 (1,000 base + 500 flex) |
+| Copilot Pro+ | $39/mo | 7,000 (3,900 base + 3,100 flex) |
+| Copilot Business | $19/user/mo | 1,900/user |
+| Copilot Enterprise | $39/user/mo | 3,900/user |
 
 Credits beyond the included amount are billed at the token rates below. Admins can cap spending to prevent overruns.
 

@@ -5,15 +5,10 @@
     "args": [
       "-y",
       "@microsoft/workiq",
-      "mcp",
-      "--account",
-      "$WORKIQ_ACCOUNT"
+      "mcp"
     ],
     "tools": [
       "*"
-    ],
-    "env": {
-      "WORKIQ_ACCOUNT": "${{ secrets.WORKIQ_ACCOUNT }}"
-    }
+    ]
   }
 }

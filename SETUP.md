@@ -109,19 +109,14 @@ npx -y @microsoft/workiq accept-eula
 npx -y @microsoft/workiq ask -q "hello"
 ```
 
-After authenticating, set one secret:
+After authenticating, no MCP secret is needed — the workiq MCP server picks up your cached credentials automatically.
 
-| Secret name | Value |
-|---|---|
-| `WORKIQ_ACCOUNT` | Your Microsoft account email (e.g. `you@company.com`) |
-
-The MCP server looks up your cached credentials using this email. No client ID or secret needed.
+> **Note:** Earlier versions of this repo passed `--account $WORKIQ_ACCOUNT` to the workiq MCP server. That flag is **not** part of the workiq CLI (verified against the published package May 2026). The MCP server uses whichever account was cached during the `accept-eula` / `ask` interactive auth.
 
 ### All other agents
 
 | Secret name | Used by |
 |---|---|
-| `WORKIQ_ACCOUNT` | mail-agent, workspace-agent (M365/Outlook/Teams) |
 | `COPILOT_VCS_TOKEN` | project-agent — GitHub/GitLab PAT, or Atlassian API token for Jira |
 | `COPILOT_VCS_ORG` | project-agent (GitHub/GitLab only) |
 | `COPILOT_CICD_TOKEN` | devops-agent |
