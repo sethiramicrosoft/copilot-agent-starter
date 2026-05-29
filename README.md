@@ -307,15 +307,24 @@ Quick answer: they're different products solving different problems. You don't h
 
 ### What it doesn't do (vs Copilot Cowork)
 
-- **No autonomous multi-step orchestration across M365 apps** — Cowork can chain "find conflict → draft email → reschedule" as one server-side task. Our CLI agents need you to invoke each one (or use `/fleet` for parallel)
-- **No in-document editing of Excel / Word / PowerPoint** — workiq MCP exposes Q&A and search over org data, not direct authoring in Office apps
-- **No pre-wired federated connectors** — Cowork ships with monday.com, S&P Global, Miro, etc. integrated. Here you wire each MCP yourself
-- **No cross-agent shared context** — data-agent doesn't see what mail-agent just read; each call is its own session
-- **No cloud execution for interactive sessions** — your machine needs to be on (devops-agent in GitHub Actions is the exception)
-- **No centralised agent governance** — that's what Agent 365 is for; we don't replace it
-- **CLI only** — non-technical teammates won't find it friendly
-- **Mail and workspace agents (M365/Outlook)** — require a one-time interactive login via `@microsoft/workiq` (see SETUP.md). They DO get Work IQ semantic index access for M365 data; other agents (data, devops, project, research) do not.
-- **Heavy usage may hit credit limits** on your Copilot plan
+Honest list — most "limitations" are smaller than they look:
+
+- **No in-document editing of Excel / Word / PowerPoint** — workiq MCP does Q&A and search over org data, but doesn't write into Office documents. Cowork edits docs in-app via the Copilot-in-Office layer, which isn't exposed via MCP.
+- **No automatic shared context across separate `--agent` one-shot calls** — each one-shot CLI invocation is its own session. Inside a single interactive `copilot` session, the main agent can delegate to sub-agents and context flows. With `/fleet`, parallel agents share the initial prompt but not each other's results.
+- **No fully-managed governance** — Copilot Business/Enterprise has admin controls (audit, content exclusions, model restrictions), but Agent 365's deeper per-agent identity, tenant-wide policy, and Defender/Purview integration is its own product
+- **CLI-first UX** — the same agent files also work in VS Code Copilot Chat (GUI), but non-technical users on a managed laptop will find VS Code or Cowork more natural than a terminal
+
+### What it DOES that the earlier table understated
+
+- **Multi-step orchestration**: autopilot mode lets one agent chain workiq calls — "find tomorrow's conflicts → draft a reschedule email → confirm" runs in one invocation
+- **Federated MCP connectors**: if your tenant admin wired monday.com / S&P Global / Miro etc. into M365 as federated Copilot connectors, Work IQ federates them and our workiq MCP sees them automatically — no separate wiring
+- **Cloud / headless execution**: devops-agent runs in GitHub Actions via the included `.github/workflows/diagnose-failure.yml`. Copilot CLI's cloud agent feature covers other headless workflows.
+- **Work IQ semantic index access**: mail-agent and workspace-agent have it via the official `@microsoft/workiq` MCP — same Work IQ that powers Cowork
+
+### Setup notes (not limitations)
+
+- mail-agent and workspace-agent need a one-time `npx -y @microsoft/workiq accept-eula` + `ask -q "hello"` to authenticate (SETUP.md)
+- Heavy usage draws from your Copilot AI Credits ($0.01/credit); see Cost section
 
 ### Complementary use example
 
