@@ -43,14 +43,16 @@ Pick a config from `mcp-examples/`, paste it into the agent's `mcp-servers:` blo
 
 Out of the box, after install + auth for any agents you use, these work with **zero further config**:
 
-| Agent | Backend | What you need |
-|---|---|---|
-| research-agent | built-in web/GitHub search | nothing |
-| project-agent | Copilot CLI's built-in GitHub MCP | nothing (uses your Copilot session auth) |
-| devops-agent | built-in GitHub MCP + shell | nothing |
-| mail-agent | `@microsoft/workiq` (M365 Outlook) | M365 sign-in (one-time `npx -y @microsoft/workiq accept-eula` + `ask -q "hello"`) |
-| workspace-agent | `@microsoft/workiq` (M365 Teams/SharePoint/OneDrive) | same M365 sign-in |
-| data-agent | none (DB path/creds vary) | Edit agent file with your DB path — examples in `mcp-examples/database/` |
+| Agent | Backend | What you need | Verified live |
+|---|---|---|---|
+| research-agent | built-in web/GitHub search | nothing | ✅ |
+| project-agent | Copilot CLI's built-in GitHub MCP | nothing (uses your Copilot session auth) | ✅ real commit SHA returned |
+| devops-agent | built-in GitHub MCP + shell | nothing | ✅ real Actions workflow list returned |
+| mail-agent | `@microsoft/workiq` (M365 Outlook) | M365 sign-in (one-time `npx -y @microsoft/workiq accept-eula` + `ask -q "hello"`) | ✅ real Outlook subjects returned |
+| workspace-agent | `@microsoft/workiq` (M365 Teams/SharePoint/OneDrive) | same M365 sign-in | ✅ real SharePoint docs returned |
+| data-agent | none (DB path/creds vary) | Edit agent file with your DB path — examples in `mcp-examples/database/` | ✅ tested against real SQLite |
+
+All 6 default paths tested end-to-end against real backends on May 29, 2026. Alternative MCP configs in `mcp-examples/` (GitLab, Jira, Slack, Notion, Postgres, MS SQL, Snowflake, Azure DevOps) are based on each vendor's official documentation but not individually tested in this repo — they require real accounts to verify.
 
 To swap a default (e.g. GitLab instead of GitHub, Snowflake for data-agent), drop a different config from `mcp-examples/` into the agent's `mcp-servers:` block.
 
