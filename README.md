@@ -57,14 +57,35 @@ cp copilot-agent-starter/AGENTS.md ~/.copilot/
 cp -r copilot-agent-starter/agents ~/.copilot/
 ```
 
-That's it. All six agents load immediately — no MCP config needed to get started. Test with `research-agent` or `devops-agent` first (zero credentials), then wire MCP for the others when you're ready. See [SETUP.md](SETUP.md) for the full walkthrough.
+That's it. All six agents load immediately — no MCP config needed to get started.
+
+## Try it now (no credentials needed)
+
+Run these two commands to confirm everything is working before you touch anything else:
+
+```bash
+# research-agent — built-in web + GitHub search, zero setup
+gh copilot -- --agent research-agent -p "What is the latest stable version of Node.js?" --allow-all-urls
+
+# devops-agent — shell + built-in GitHub MCP, zero setup
+gh copilot -- --agent devops-agent -p "Are there any GitHub Actions workflows in sethiramicrosoft/copilot-agent-starter?" --allow-all
+```
+
+If both respond, you're good. The other four agents work the same way once you wire their MCP — see [SETUP.md](SETUP.md).
 
 ## Usage
 
+**Interactive session** — start a session and select or call an agent by name:
+```bash
+gh copilot
+# inside the session:
+# /agent                            ← browse and pick an agent
+# Use the research-agent to...      ← call by name in your prompt
 ```
-/agent                                        ← browse and select interactively
-Use the workspace-agent to...                 ← call by name in a prompt
-copilot --agent=research-agent --prompt "..."  ← CLI flag for one-shot tasks
+
+**One-shot from the terminal** — useful for scripting or quick tasks:
+```bash
+gh copilot -- --agent research-agent -p "your prompt here" --allow-all-urls
 ```
 
 ## Examples by agent
