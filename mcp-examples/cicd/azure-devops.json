@@ -1,8 +1,14 @@
 {
   "cicd-mcp": {
-    "type": "stdio",
+    "type": "local",
     "command": "npx",
-    "args": ["-y", "@azure-devops/mcp"],
+    "args": [
+      "-y",
+      "@azure-devops/mcp"
+    ],
+    "tools": [
+      "*"
+    ],
     "env": {
       "AZURE_DEVOPS_ORG": "${{ secrets.COPILOT_CICD_ORG }}",
       "AZURE_DEVOPS_TOKEN": "${{ secrets.COPILOT_CICD_TOKEN }}"

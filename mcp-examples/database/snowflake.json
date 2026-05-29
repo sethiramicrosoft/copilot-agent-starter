@@ -1,8 +1,13 @@
 {
   "db-mcp": {
-    "type": "stdio",
+    "type": "local",
     "command": "uvx",
-    "args": ["mcp-server-snowflake"],
+    "args": [
+      "mcp-server-snowflake"
+    ],
+    "tools": [
+      "*"
+    ],
     "env": {
       "SNOWFLAKE_ACCOUNT": "${{ secrets.SNOWFLAKE_ACCOUNT }}",
       "SNOWFLAKE_USER": "${{ secrets.SNOWFLAKE_USER }}",

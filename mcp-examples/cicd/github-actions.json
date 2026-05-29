@@ -1,8 +1,14 @@
 {
   "cicd-mcp": {
-    "type": "stdio",
+    "type": "local",
     "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-github"],
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-github"
+    ],
+    "tools": [
+      "*"
+    ],
     "env": {
       "GITHUB_TOKEN": "${{ secrets.COPILOT_CICD_TOKEN }}",
       "GITHUB_ORG": "${{ secrets.COPILOT_CICD_ORG }}"

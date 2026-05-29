@@ -1,8 +1,14 @@
 {
   "workspace-mcp": {
-    "type": "stdio",
+    "type": "local",
     "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-slack"],
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-slack"
+    ],
+    "tools": [
+      "*"
+    ],
     "env": {
       "SLACK_BOT_TOKEN": "${{ secrets.COPILOT_WORKSPACE_CLIENT_ID }}",
       "SLACK_TEAM_ID": "${{ secrets.COPILOT_WORKSPACE_TENANT_ID }}"

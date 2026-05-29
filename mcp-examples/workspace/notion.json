@@ -1,8 +1,14 @@
 {
   "workspace-mcp": {
-    "type": "stdio",
+    "type": "local",
     "command": "npx",
-    "args": ["-y", "@notionhq/notion-mcp-server"],
+    "args": [
+      "-y",
+      "@notionhq/notion-mcp-server"
+    ],
+    "tools": [
+      "*"
+    ],
     "env": {
       "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer ${{ secrets.COPILOT_WORKSPACE_CLIENT_ID }}\"}"
     }

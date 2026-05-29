@@ -1,8 +1,14 @@
 {
   "mail-mcp": {
-    "type": "stdio",
+    "type": "local",
     "command": "npx",
-    "args": ["-y", "@microsoft/workiq"],
+    "args": [
+      "-y",
+      "@microsoft/workiq"
+    ],
+    "tools": [
+      "*"
+    ],
     "env": {
       "WORKIQ_CLIENT_ID": "${{ secrets.COPILOT_MAIL_CLIENT_ID }}",
       "WORKIQ_CLIENT_SECRET": "${{ secrets.COPILOT_MAIL_CLIENT_SECRET }}",

@@ -1,8 +1,14 @@
 {
   "db-mcp": {
-    "type": "stdio",
+    "type": "local",
     "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-postgres"],
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-postgres"
+    ],
+    "tools": [
+      "*"
+    ],
     "env": {
       "POSTGRES_CONNECTION_STRING": "${{ secrets.COPILOT_DB_CONNECTION_STRING }}"
     }

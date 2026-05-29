@@ -67,9 +67,10 @@ model: claude-opus-4.7
 tools: ["read", "search", "execute", "db-mcp/query", "db-mcp/list_tables", "db-mcp/describe_table"]
 mcp-servers:
   db-mcp:
-    type: stdio
+    type: 'local'
     command: npx
-    args: ["-y", "@modelcontextprotocol/server-postgres"]
+    args: ['-y', '@modelcontextprotocol/server-postgres']
+    tools: ["*"]
     env:
       DB_CONNECTION_STRING: ${{ secrets.COPILOT_DB_CONNECTION_STRING }}
 ---

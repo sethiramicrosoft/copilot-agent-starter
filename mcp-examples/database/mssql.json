@@ -1,8 +1,14 @@
 {
   "db-mcp": {
-    "type": "stdio",
+    "type": "local",
     "command": "npx",
-    "args": ["-y", "@azure/mcp"],
+    "args": [
+      "-y",
+      "@azure/mcp"
+    ],
+    "tools": [
+      "*"
+    ],
     "env": {
       "AZURE_SUBSCRIPTION_ID": "${{ secrets.AZURE_SUBSCRIPTION_ID }}",
       "AZURE_RESOURCE_GROUP": "${{ secrets.AZURE_RESOURCE_GROUP }}"
