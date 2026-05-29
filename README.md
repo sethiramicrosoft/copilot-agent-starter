@@ -118,17 +118,55 @@ copilot --agent=research-agent --prompt "..."  ← CLI flag for one-shot tasks
 
 ## Who uses which agent — by role
 
-| Role | Agents |
-|---|---|
-| **Software engineer** | project-agent, devops-agent, data-agent, research-agent |
-| **DevOps / platform** | devops-agent, project-agent, data-agent |
-| **Data analyst** | data-agent, research-agent, project-agent |
-| **Product / project manager** | project-agent, workspace-agent, research-agent, mail-agent |
-| **Engineering manager** | workspace-agent, project-agent, devops-agent |
-| **Executive assistant** | mail-agent, workspace-agent |
-| **Executive** | workspace-agent, data-agent, research-agent |
+**Technical roles:**
 
-See [SETUP.md](SETUP.md) for role-by-role use cases with full examples.
+| Role | Primary agents | What they use it for |
+|---|---|---|
+| Software engineer | project-agent, devops-agent, research-agent | Open PRs, debug pipelines, research libraries |
+| DevOps / platform | devops-agent, project-agent | Monitor CI, manage pipeline templates |
+| Data analyst | data-agent, research-agent | SQL on demand, methodology research |
+| Data engineer | data-agent, project-agent | Schema analysis, data quality issues |
+| QA engineer | project-agent, devops-agent | Track test failures, trigger pipeline reruns |
+| Security engineer | research-agent, project-agent | CVE research, create security issues |
+
+**Non-technical roles:**
+
+| Role | Primary agents | What they use it for |
+|---|---|---|
+| Product manager | project-agent, workspace-agent, research-agent | Sprint issues from retros, competitor research |
+| Project manager | project-agent, workspace-agent | Task tracking, status summaries across channels |
+| Engineering manager | workspace-agent, project-agent, devops-agent | Team shipping summary, sprint health, pipeline health |
+| Executive assistant | mail-agent, workspace-agent | Inbox triage, meeting notes, follow-up tasks |
+| Executive | workspace-agent, data-agent, research-agent | Business metrics, market intelligence, weekly summaries |
+
+See [SETUP.md](SETUP.md) for role-by-role examples with full prompts.
+
+## How this complements M365 Copilot and Claude for Work
+
+These are fundamentally different tools solving different problems:
+
+| | M365 Copilot | Claude for Work | This fleet |
+|---|---|---|---|
+| **Lives in** | Office apps (Teams, Outlook, Word) | claude.ai browser tab | Your terminal |
+| **What it does** | Helps you work *inside* Office | Answers questions, drafts content | Takes *actions* across your tools |
+| **Can run code?** | ❌ | ❌ | ✅ |
+| **Can query a database?** | ❌ | ❌ | ✅ |
+| **Can trigger CI/CD?** | ❌ | ❌ | ✅ |
+| **Can open a GitHub issue?** | ❌ | ❌ | ✅ |
+| **Can switch models per task?** | ❌ | ❌ | ✅ |
+| **Locked to one vendor?** | Microsoft only | Anthropic only | Any stack |
+
+M365 Copilot and Claude for Work are **conversation tools** — they help you think and write faster inside their platform. This fleet is an **action system** — it reads from those platforms and does something with the output.
+
+**Concrete example:**
+> 1. M365 Copilot summarises your Teams meeting (inside Teams)
+> 2. `workspace-agent` pulls those notes and extracts action items
+> 3. `project-agent` creates the tickets in Jira or GitHub
+> 4. `devops-agent` checks if the related CI pipeline is green
+>
+> M365 Copilot stayed in Teams. This fleet crossed every boundary it can't.
+
+**M365 Copilot and Claude for Work are data sources. This fleet is what acts on the data.**
 
 ## Use with copilot-fleet-starter
 
