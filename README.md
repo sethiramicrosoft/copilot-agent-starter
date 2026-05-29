@@ -56,6 +56,12 @@ All 6 default paths tested end-to-end against real backends on May 29, 2026. Alt
 
 To swap a default (e.g. GitLab instead of GitHub, Snowflake for data-agent), drop a different config from `mcp-examples/` into the agent's `mcp-servers:` block.
 
+### Same agents, GUI experience (for non-technical teammates)
+
+The agents in this repo also work in **VS Code Copilot Chat** — no extra install, no different format. VS Code's Copilot Chat [reads the same `~/.copilot/agents/` directory](https://code.visualstudio.com/docs/copilot/customization/custom-agents#_custom-agent-file-locations) as the CLI. Open Copilot Chat, pick the agent, type your prompt — done. Useful when a non-technical teammate wants `mail-agent` or `workspace-agent` without touching a terminal.
+
+For workspace-level agents (ship per repo so the whole team gets them), drop the `.agent.md` files into `.github/agents/` in your repo and they appear in both VS Code Chat and the CLI.
+
 ## Tool scoping — enforced, not instructed
 
 Most agent setups rely on a prompt saying "only use relevant tools." That's a suggestion. This repo uses the `tools:` array in frontmatter — the platform enforces it. `devops-agent` cannot call mail MCP tools because they're not in its list. Each agent only loads the MCP servers declared in its own file.
