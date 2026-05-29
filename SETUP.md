@@ -81,12 +81,14 @@ The full args and env for each provider are in `mcp-examples/`. Just copy the re
 
 | Agent | Pick from |
 |---|---|
-| mail-agent | `mcp-examples/mail/` — outlook.json, gmail.json |
-| project-agent | `mcp-examples/vcs/` — github.json, gitlab.json, jira.json, azure-devops.json |
-| devops-agent | `mcp-examples/cicd/` — github-actions.json, azure-devops.json, gitlab-ci.json |
-| data-agent | `mcp-examples/database/` — postgres.json, sqlite.json, mssql.json, snowflake.json |
-| workspace-agent | `mcp-examples/workspace/` — m365.json, slack.json, notion.json |
+| mail-agent | `mcp-examples/mail/` — outlook.json (`@microsoft/workiq`) |
+| project-agent | `mcp-examples/vcs/` — github.json, gitlab.json, jira.json (Atlassian remote MCP — no install needed) |
+| devops-agent | `mcp-examples/cicd/` — github-actions.json, gitlab-ci.json, azure-devops.json (`@azure-devops/mcp`) |
+| data-agent | `mcp-examples/database/` — postgres.json, sqlite.json (`uvx`, no secret), mssql.json (`@azure/mcp`), snowflake.json (`uvx`) |
+| workspace-agent | `mcp-examples/workspace/` — m365.json (`@microsoft/workiq`), slack.json, notion.json (`@notionhq/notion-mcp-server`) |
 | research-agent | No MCP needed — built-in web + GitHub search |
+
+All packages are official — published by the tool vendor or the modelcontextprotocol org. No community packages.
 
 ---
 
@@ -96,16 +98,23 @@ Set secrets as environment variables or Copilot agent secrets. Only set what you
 
 | Secret name | Used by |
 |---|---|
-| `COPILOT_MAIL_CLIENT_ID` | mail-agent |
+| `COPILOT_MAIL_CLIENT_ID` | mail-agent (Outlook via `@microsoft/workiq`) |
 | `COPILOT_MAIL_CLIENT_SECRET` | mail-agent |
-| `COPILOT_MAIL_TENANT_ID` | mail-agent (Outlook only) |
-| `COPILOT_VCS_TOKEN` | project-agent |
-| `COPILOT_VCS_ORG` | project-agent |
-| `COPILOT_CICD_TOKEN` | devops-agent (with CI/CD MCP) |
-| `COPILOT_CICD_ORG` | devops-agent (with CI/CD MCP) |
-| `COPILOT_DB_CONNECTION_STRING` | data-agent |
-| `COPILOT_WORKSPACE_CLIENT_ID` | workspace-agent |
-| `COPILOT_WORKSPACE_CLIENT_SECRET` | workspace-agent |
+| `COPILOT_MAIL_TENANT_ID` | mail-agent |
+| `COPILOT_VCS_TOKEN` | project-agent — GitHub/GitLab PAT, or Atlassian API token for Jira |
+| `COPILOT_VCS_ORG` | project-agent (GitHub/GitLab only) |
+| `COPILOT_CICD_TOKEN` | devops-agent |
+| `COPILOT_CICD_ORG` | devops-agent |
+| `COPILOT_DB_CONNECTION_STRING` | data-agent (Postgres) |
+| `AZURE_SUBSCRIPTION_ID` | data-agent (Azure SQL via `@azure/mcp`) |
+| `AZURE_RESOURCE_GROUP` | data-agent (Azure SQL via `@azure/mcp`) |
+| `SNOWFLAKE_ACCOUNT` | data-agent (Snowflake) |
+| `SNOWFLAKE_USER` | data-agent (Snowflake) |
+| `SNOWFLAKE_PASSWORD` | data-agent (Snowflake) |
+| `SNOWFLAKE_DATABASE` | data-agent (Snowflake) |
+| `SNOWFLAKE_WAREHOUSE` | data-agent (Snowflake) |
+| `COPILOT_WORKSPACE_CLIENT_ID` | workspace-agent (M365/Slack/Notion) |
+| `COPILOT_WORKSPACE_CLIENT_SECRET` | workspace-agent (M365 only) |
 | `COPILOT_WORKSPACE_TENANT_ID` | workspace-agent (M365 only) |
 
 ---

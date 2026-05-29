@@ -22,10 +22,10 @@ Companion to [copilot-fleet-starter](https://github.com/sethiramicrosoft/copilot
 
 mcp-examples/
 ├── mail/       → outlook.json
-├── database/   → postgres.json, sqlite.json, mssql.json
-├── cicd/       → github-actions.json, gitlab-ci.json
+├── database/   → postgres.json, sqlite.json, mssql.json, snowflake.json
+├── cicd/       → github-actions.json, gitlab-ci.json, azure-devops.json
 ├── workspace/  → m365.json, slack.json, notion.json
-└── vcs/        → github.json, gitlab.json
+└── vcs/        → github.json, gitlab.json, jira.json
 ```
 
 ## Why this exists
@@ -134,20 +134,25 @@ gh copilot -- --agent research-agent -p "your prompt here" --allow-all-urls
 
 ## Configuring secrets
 
-All MCP configs use official vendor packages — no community packages. Each config ships in `mcp-examples/` ready to copy into the agent's `mcp-servers:` block. See [SETUP.md](SETUP.md) for how.
+All MCP configs use official vendor packages only — no community packages. Each config ships in `mcp-examples/` ready to copy into the agent's `mcp-servers:` block. See [SETUP.md](SETUP.md) for how.
 
-| Agent | MCP package | Secrets needed |
-|---|---|---|
-| mail-agent | `@microsoft/workiq` | `COPILOT_MAIL_CLIENT_ID`, `COPILOT_MAIL_CLIENT_SECRET`, `COPILOT_MAIL_TENANT_ID` |
-| project-agent | `@modelcontextprotocol/server-github` or `server-gitlab` | `COPILOT_VCS_TOKEN`, `COPILOT_VCS_ORG` |
-| data-agent (Postgres) | `@modelcontextprotocol/server-postgres` | `COPILOT_DB_CONNECTION_STRING` |
-| data-agent (SQLite) | `uvx mcp-server-sqlite` (official Anthropic) | path to `.db` file only — no secret |
-| data-agent (Azure SQL) | `@azure/mcp` | `AZURE_SUBSCRIPTION_ID`, `AZURE_RESOURCE_GROUP` |
-| devops-agent | `@modelcontextprotocol/server-github` or `server-gitlab` | `COPILOT_CICD_TOKEN`, `COPILOT_CICD_ORG` |
-| workspace-agent (M365) | `@microsoft/workiq` | `COPILOT_WORKSPACE_CLIENT_ID`, `COPILOT_WORKSPACE_CLIENT_SECRET`, `COPILOT_WORKSPACE_TENANT_ID` |
-| workspace-agent (Slack) | `@modelcontextprotocol/server-slack` | `COPILOT_WORKSPACE_CLIENT_ID` (bot token), `COPILOT_WORKSPACE_TENANT_ID` (team ID) |
-| workspace-agent (Notion) | `@notionhq/notion-mcp-server` | `COPILOT_WORKSPACE_CLIENT_ID` (API key) |
-| research-agent | none | none — uses built-in web + GitHub search |
+| Agent | Config | Package / endpoint | Secrets needed |
+|---|---|---|---|
+| mail-agent | `mail/outlook.json` | `@microsoft/workiq` (Microsoft) | `COPILOT_MAIL_CLIENT_ID`, `COPILOT_MAIL_CLIENT_SECRET`, `COPILOT_MAIL_TENANT_ID` |
+| project-agent | `vcs/github.json` | `@modelcontextprotocol/server-github` | `COPILOT_VCS_TOKEN` |
+| project-agent | `vcs/gitlab.json` | `@modelcontextprotocol/server-gitlab` | `COPILOT_VCS_TOKEN` |
+| project-agent | `vcs/jira.json` | Atlassian remote MCP (HTTPS, no install) | `COPILOT_VCS_TOKEN` (Atlassian API token) |
+| data-agent | `database/postgres.json` | `@modelcontextprotocol/server-postgres` | `COPILOT_DB_CONNECTION_STRING` |
+| data-agent | `database/sqlite.json` | `uvx mcp-server-sqlite` (Anthropic) | path to `.db` file — no secret |
+| data-agent | `database/mssql.json` | `@azure/mcp` (Microsoft) | `AZURE_SUBSCRIPTION_ID`, `AZURE_RESOURCE_GROUP` |
+| data-agent | `database/snowflake.json` | `uvx mcp-server-snowflake` (Snowflake) | `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USER`, `SNOWFLAKE_PASSWORD`, `SNOWFLAKE_DATABASE`, `SNOWFLAKE_WAREHOUSE` |
+| devops-agent | `cicd/github-actions.json` | `@modelcontextprotocol/server-github` | `COPILOT_CICD_TOKEN` |
+| devops-agent | `cicd/gitlab-ci.json` | `@modelcontextprotocol/server-gitlab` | `COPILOT_CICD_TOKEN` |
+| devops-agent | `cicd/azure-devops.json` | `@azure-devops/mcp` (Microsoft) | `COPILOT_CICD_ORG`, `COPILOT_CICD_TOKEN` |
+| workspace-agent | `workspace/m365.json` | `@microsoft/workiq` (Microsoft) | `COPILOT_WORKSPACE_CLIENT_ID`, `COPILOT_WORKSPACE_CLIENT_SECRET`, `COPILOT_WORKSPACE_TENANT_ID` |
+| workspace-agent | `workspace/slack.json` | `@modelcontextprotocol/server-slack` | `COPILOT_WORKSPACE_CLIENT_ID` (bot token), `COPILOT_WORKSPACE_TENANT_ID` (team ID) |
+| workspace-agent | `workspace/notion.json` | `@notionhq/notion-mcp-server` (Notion) | `COPILOT_WORKSPACE_CLIENT_ID` (API key) |
+| research-agent | none needed | built-in web + GitHub search | none |
 
 ## Who uses which agent — by role
 
