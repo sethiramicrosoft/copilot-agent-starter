@@ -208,18 +208,24 @@ All MCP configs use official vendor packages only — no community packages. Eac
 
 See [SETUP.md](SETUP.md) for role-by-role examples with full prompts.
 
-## How this fits with M365 Copilot CoWork and Claude Cowork
+## How this fits with Microsoft Copilot Cowork, Agent 365, and Claude Cowork
 
 Quick answer: they're different products solving different problems. You don't have to choose.
 
 ### What each product does
 
-**M365 Copilot CoWork** (Microsoft, Frontier preview May 2026, $30–99/user/month on top of M365):
+**Microsoft Copilot Cowork** (Microsoft, Research Preview March 2026, $30/user/month on top of M365 Copilot):
 - Runs in the cloud — no desktop app needed
+- Powered by Anthropic's Claude; executes multi-step tasks across M365 apps (Outlook, Teams, Excel, SharePoint)
 - Has Work IQ underneath: a semantic index of your org's M365 data, org graph, Dynamics, and external data via federated MCP connectors
-- Work IQ CLI lets developers pull M365 org context into their own tools
 - Microsoft controls model routing — you don't pick
-- Native to M365 ecosystem; 3rd party tools available via MCP connectors (Frontier preview, requires admin setup)
+- Native to M365 ecosystem; 3rd party tools available via MCP connectors (requires admin setup)
+
+**Microsoft Agent 365** (Microsoft, GA May 2026, $15/user/month standalone or included in M365 E7 at $99/user/month):
+- Not an AI agent itself — it's the **governance and control plane** for AI agents inside your Microsoft tenant
+- Lets IT admins observe, govern, and secure both Microsoft and third-party agents
+- Relevant for enterprises that need audit trails and policy controls over agent activity
+- E7 bundle ($99/user/mo) combines E5 + Copilot + Agent 365 + Entra Suite
 
 **Claude Cowork** (Anthropic, 2026, requires a paid Claude plan):
 - Runs on your desktop — your laptop has to be on and the app open
@@ -249,22 +255,24 @@ Quick answer: they're different products solving different problems. You don't h
 
 ### Feature comparison
 
-| | M365 CoWork | Claude Cowork | agent-starter |
-|---|---|---|---|
-| **Runs without a laptop** | ✅ cloud — confirmed, tasks keep running across devices | ❌ laptop must stay on and app open | ❌ interactive use needs your machine on; devops-agent runs headless in GitHub Actions |
-| **Works outside Microsoft stack** | ⚠️ 3rd party via MCP (Frontier preview, admin setup) | ✅ plugins | ✅ any MCP server |
-| **You control model per agent** | ❌ Microsoft routes | ❌ Claude only | ✅ per-agent in YAML |
-| **Platform-enforced tool scoping** | ✅ | ❌ plugin OAuth | ✅ `tools:` array |
-| **Runs in GitHub Actions** | ❌ | ❌ | ⚠️ devops-agent yes; project-agent partially; research/mail/workspace no |
-| **Can query a database** | limited | ❌ | ✅ via MCP |
-| **No extra subscription** | ❌ $30–99/mo add-on | ❌ separate paid plan | ✅ uses your GHCP seat |
-| **Org semantic index** | ✅ Work IQ | ❌ | ❌ |
-| **Computer use (apps, browser)** | ❌ | ✅ | ❌ |
-| **Non-technical user UX** | ✅ | ✅ | ❌ CLI only |
+| | Copilot Cowork (M365) | Agent 365 | Claude Cowork | agent-starter |
+|---|---|---|---|---|
+| **Runs without a laptop** | ✅ cloud | ✅ cloud (governance layer) | ❌ laptop must stay on | ❌ interactive needs machine on; devops-agent runs headless in GitHub Actions |
+| **Works outside Microsoft stack** | ⚠️ 3rd party via MCP (admin setup) | ⚠️ Microsoft tenant only | ✅ plugins | ✅ any MCP server |
+| **You control model per agent** | ❌ Microsoft routes (Claude) | ❌ n/a | ❌ Claude only | ✅ per-agent in YAML |
+| **Platform-enforced tool scoping** | ✅ | ✅ governance layer | ❌ plugin OAuth | ✅ `tools:` array |
+| **Runs in GitHub Actions** | ❌ | ❌ | ❌ | ⚠️ devops-agent yes; project-agent partially |
+| **Can query a database** | limited | ❌ | ❌ | ✅ via MCP |
+| **No extra subscription** | ❌ $30/user/mo | ❌ $15/user/mo (or E7 $99/mo bundle) | ❌ separate paid plan | ✅ uses your GHCP seat |
+| **Org semantic index** | ✅ Work IQ | ✅ via Work IQ | ❌ | ❌ |
+| **Computer use (apps, browser)** | ❌ | ❌ | ✅ | ❌ |
+| **Non-technical user UX** | ✅ | ✅ (IT admin UX) | ✅ | ❌ CLI only |
 
 ### When to use which
 
-**M365 CoWork** — your org is deep in M365 and you want cloud-native org intelligence (who owns what, collaboration patterns, Dynamics data). Great for knowledge workers who don't want to touch a terminal.
+**Copilot Cowork** — your org is deep in M365 and you want cloud-native org intelligence (who owns what, collaboration patterns, Dynamics data). Great for knowledge workers who don't want to touch a terminal.
+
+**Agent 365** — your IT/security team needs governance and audit trails over AI agent activity across the tenant. This is an enterprise IT product, not an end-user productivity tool.
 
 **Claude Cowork** — you need computer use (browser automation, local file work, spreadsheets) or recurring tasks that run from a desktop. Strong for non-technical users not on M365.
 
@@ -284,12 +292,12 @@ Quick answer: they're different products solving different problems. You don't h
 
 ### Complementary use example
 
-> 1. **M365 CoWork** surfaces a risk in the Work IQ org graph
+> 1. **Copilot Cowork** surfaces a risk in the Work IQ org graph
 > 2. **workspace-agent** pulls the meeting notes and extracts action items
 > 3. **project-agent** creates issues in Jira or GitHub
 > 4. **devops-agent** checks if the related CI pipeline is green
 >
-> M365 CoWork stays in its lane. agent-starter crosses the boundaries it can't.
+> Copilot Cowork stays in its lane. agent-starter crosses the boundaries it can't.
 
 ## Running devops-agent headless in GitHub Actions
 
