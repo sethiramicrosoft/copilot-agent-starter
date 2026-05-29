@@ -258,15 +258,15 @@ Quick answer: they're different products solving different problems. You don't h
 | | Copilot Cowork (M365) | Agent 365 | Claude Cowork | agent-starter |
 |---|---|---|---|---|
 | **Runs without a laptop** | ✅ cloud | ✅ cloud (governance layer) | ❌ laptop must stay on | ❌ interactive needs machine on; devops-agent runs headless in GitHub Actions |
-| **Works outside Microsoft stack** | ⚠️ 3rd party via MCP (admin setup) | ⚠️ Microsoft tenant only | ✅ plugins | ✅ any MCP server |
-| **You control model per agent** | ❌ Microsoft routes (Claude) | ❌ n/a | ❌ Claude only | ✅ per-agent in YAML |
-| **Platform-enforced tool scoping** | ✅ | ✅ governance layer | ❌ plugin OAuth | ✅ `tools:` array |
+| **Works outside Microsoft stack** | ❌ M365 apps only (preview) | ⚠️ tenant-bound; partner agents can integrate external services | ✅ plugins (Slack, Notion, GitHub, Google Drive and more) | ✅ any MCP server |
+| **You control model per agent** | ❌ Claude variants only (Sonnet 4.6 or Opus 4.6) | ⚠️ model choice available via Copilot Studio | ❌ Claude only | ✅ per-agent in YAML |
+| **Platform-enforced tool scoping** | ✅ tenant permissions + governance | ✅ governance layer | ❌ plugin OAuth consent | ✅ `tools:` array |
 | **Runs in GitHub Actions** | ❌ | ❌ | ❌ | ⚠️ devops-agent yes; project-agent partially |
-| **Can query a database** | limited | ❌ | ✅ via Data plugin (Snowflake, BigQuery, Databricks, SQL) | ✅ via MCP |
-| **No extra subscription** | ❌ $30/user/mo | ❌ $15/user/mo (or E7 $99/mo bundle) | ❌ separate paid plan | ✅ uses your GHCP seat |
+| **Can query a database** | ⚠️ M365 data only (Excel, SharePoint) | ⚠️ via connectors/agents | ✅ via Data plugin (Snowflake, BigQuery, Databricks, SQL) | ✅ via MCP |
+| **No extra subscription** | ❌ $30/user/mo (M365 Copilot add-on) | ❌ $15/user/mo standalone; included in E7 ($99/mo bundle) | ❌ separate paid plan | ✅ uses your GHCP seat |
 | **Org semantic index** | ✅ Work IQ | ✅ via Work IQ | ❌ | ❌ |
-| **Computer use (apps, browser)** | ❌ | ❌ | ✅ | ❌ |
-| **Non-technical user UX** | ✅ | ✅ (IT admin UX) | ✅ | ❌ CLI only |
+| **Computer use (apps, browser)** | ❌ | ❌ | ⚠️ limited desktop automation (not full browser control) | ❌ |
+| **Non-technical user UX** | ✅ knowledge worker UX + IT admin controls | ✅ IT admin UX | ✅ | ❌ CLI only |
 
 ### When to use which
 
