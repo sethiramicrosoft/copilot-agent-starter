@@ -262,7 +262,7 @@ Quick answer: they're different products solving different problems. You don't h
 | **You control model per agent** | ❌ Microsoft routes (Claude) | ❌ n/a | ❌ Claude only | ✅ per-agent in YAML |
 | **Platform-enforced tool scoping** | ✅ | ✅ governance layer | ❌ plugin OAuth | ✅ `tools:` array |
 | **Runs in GitHub Actions** | ❌ | ❌ | ❌ | ⚠️ devops-agent yes; project-agent partially |
-| **Can query a database** | limited | ❌ | ❌ | ✅ via MCP |
+| **Can query a database** | limited | ❌ | ✅ via Data plugin (Snowflake, BigQuery, Databricks, SQL) | ✅ via MCP |
 | **No extra subscription** | ❌ $30/user/mo | ❌ $15/user/mo (or E7 $99/mo bundle) | ❌ separate paid plan | ✅ uses your GHCP seat |
 | **Org semantic index** | ✅ Work IQ | ✅ via Work IQ | ❌ | ❌ |
 | **Computer use (apps, browser)** | ❌ | ❌ | ✅ | ❌ |
