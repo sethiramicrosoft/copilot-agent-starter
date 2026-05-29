@@ -287,7 +287,7 @@ Quick answer: they're different products solving different problems. You don't h
 | **Runs in GitHub Actions** | ❌ | ❌ | ❌ | ⚠️ devops-agent yes; project-agent partially |
 | **Can query a database** | ⚠️ M365 data only (Excel, SharePoint) | ⚠️ via connectors/agents | ✅ via Data plugin (Snowflake, BigQuery, Databricks, SQL) | ✅ via MCP |
 | **No extra subscription** | ❌ part of M365 E7 at $99/user/mo (or M365 Copilot + Frontier opt-in during preview) | ❌ $15/user/mo standalone or in E7 bundle | ❌ separate paid plan | ✅ uses your GHCP seat |
-| **Org semantic index** | ✅ Work IQ | ✅ via Work IQ | ❌ | ❌ |
+| **Org semantic index** | ✅ Work IQ | ✅ via Work IQ | ❌ | ⚠️ Work IQ via mail-agent/workspace-agent (M365 only, needs M365 license + workiq auth) |
 | **Computer use (apps, browser)** | ❌ | ❌ | ✅ Claude-in-Chrome connector + desktop apps | ❌ |
 | **Non-technical user UX** | ✅ knowledge worker UX + IT admin controls | ✅ IT admin UX | ✅ | ❌ CLI only |
 
@@ -305,13 +305,17 @@ Quick answer: they're different products solving different problems. You don't h
 - You don't want to pay for another platform subscription
 - You want tool boundaries enforced at the platform level, not just by prompt
 
-### What it doesn't do
+### What it doesn't do (vs Copilot Cowork)
 
-- No org-wide semantic index like Work IQ — it doesn't know your org's collaboration graph
-- CLI only — non-technical teammates won't find it friendly
-- Mail and workspace agents (M365/Outlook) require a one-time interactive login via `@microsoft/workiq` — see SETUP.md
-- Model inference goes through GitHub Copilot's endpoints — it's not air-gapped
-- Heavy usage may hit premium request limits on your Copilot plan
+- **No autonomous multi-step orchestration across M365 apps** — Cowork can chain "find conflict → draft email → reschedule" as one server-side task. Our CLI agents need you to invoke each one (or use `/fleet` for parallel)
+- **No in-document editing of Excel / Word / PowerPoint** — workiq MCP exposes Q&A and search over org data, not direct authoring in Office apps
+- **No pre-wired federated connectors** — Cowork ships with monday.com, S&P Global, Miro, etc. integrated. Here you wire each MCP yourself
+- **No cross-agent shared context** — data-agent doesn't see what mail-agent just read; each call is its own session
+- **No cloud execution for interactive sessions** — your machine needs to be on (devops-agent in GitHub Actions is the exception)
+- **No centralised agent governance** — that's what Agent 365 is for; we don't replace it
+- **CLI only** — non-technical teammates won't find it friendly
+- **Mail and workspace agents (M365/Outlook)** — require a one-time interactive login via `@microsoft/workiq` (see SETUP.md). They DO get Work IQ semantic index access for M365 data; other agents (data, devops, project, research) do not.
+- **Heavy usage may hit credit limits** on your Copilot plan
 
 ### Complementary use example
 
