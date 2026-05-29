@@ -138,7 +138,7 @@ All MCP configs use official vendor packages only — no community packages. Eac
 
 | Agent | Config | Package / endpoint | Secrets needed |
 |---|---|---|---|
-| mail-agent | `mail/outlook.json` | `@microsoft/workiq` (Microsoft) | `COPILOT_MAIL_CLIENT_ID`, `COPILOT_MAIL_CLIENT_SECRET`, `COPILOT_MAIL_TENANT_ID` |
+| mail-agent | `mail/outlook.json` | `@microsoft/workiq` (Microsoft) | `WORKIQ_ACCOUNT` (your email — uses cached device code auth, no app registration) |
 | project-agent | `vcs/github.json` | `@modelcontextprotocol/server-github` | `COPILOT_VCS_TOKEN` |
 | project-agent | `vcs/gitlab.json` | `@modelcontextprotocol/server-gitlab` | `COPILOT_VCS_TOKEN` |
 | project-agent | `vcs/jira.json` | Atlassian remote MCP (HTTPS, no install) | `COPILOT_VCS_TOKEN` (Atlassian API token) |
@@ -149,7 +149,7 @@ All MCP configs use official vendor packages only — no community packages. Eac
 | devops-agent | `cicd/github-actions.json` | `@modelcontextprotocol/server-github` | `COPILOT_CICD_TOKEN` |
 | devops-agent | `cicd/gitlab-ci.json` | `@modelcontextprotocol/server-gitlab` | `COPILOT_CICD_TOKEN` |
 | devops-agent | `cicd/azure-devops.json` | `@azure-devops/mcp` (Microsoft) | `COPILOT_CICD_ORG`, `COPILOT_CICD_TOKEN` |
-| workspace-agent | `workspace/m365.json` | `@microsoft/workiq` (Microsoft) | `COPILOT_WORKSPACE_CLIENT_ID`, `COPILOT_WORKSPACE_CLIENT_SECRET`, `COPILOT_WORKSPACE_TENANT_ID` |
+| workspace-agent | `workspace/m365.json` | `@microsoft/workiq` (Microsoft) | `WORKIQ_ACCOUNT` (your email — uses cached device code auth, no app registration) |
 | workspace-agent | `workspace/slack.json` | `@modelcontextprotocol/server-slack` | `COPILOT_WORKSPACE_CLIENT_ID` (bot token), `COPILOT_WORKSPACE_TENANT_ID` (team ID) |
 | workspace-agent | `workspace/notion.json` | `@notionhq/notion-mcp-server` (Notion) | `COPILOT_WORKSPACE_CLIENT_ID` (API key) |
 | research-agent | none needed | built-in web + GitHub search | none |
@@ -249,7 +249,7 @@ Quick answer: they're different products solving different problems. You don't h
 
 - No org-wide semantic index like Work IQ — it doesn't know your org's collaboration graph
 - CLI only — non-technical teammates won't find it friendly
-- Mail and workspace agents need OAuth app registration — not hard, but not instant either
+- Mail and workspace agents (M365/Outlook) require a one-time interactive login via `@microsoft/workiq` — see SETUP.md
 - Model inference goes through GitHub Copilot's endpoints — it's not air-gapped
 - Heavy usage may hit premium request limits on your Copilot plan
 
@@ -286,7 +286,7 @@ The persona fleet from [copilot-fleet-starter](https://github.com/sethiramicroso
 | Model pinned via instruction rule | `model:` property in frontmatter |
 | Tool use scoped by instructions | `tools:` array (platform-enforced) |
 | Shared global MCPs | `mcp-servers:` scoped per agent |
-| Invoked via `/fleet` for parallel review | Invoked via `/agent` or `--agent=` |
+| Invoked via `/fleet` for parallel review | Invoked via `/agent` or `--agent` flag |
 | **Purpose: review code** | **Purpose: do domain work** |
 
 > **Note on `model:`** — honoured in VS Code and interactive CLI. If you're using cloud agent (GitHub Actions), verify it's respected in your GHCP plan.
