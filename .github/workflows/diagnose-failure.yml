@@ -89,7 +89,7 @@ jobs:
 
           Diagnose the root cause. Be specific: identify the failing step, the exact error, and explain why it failed. Then suggest the most likely fix. Keep the response concise — 3 sections max: Root Cause, Why It Failed, Suggested Fix."
 
-          RESULT=$(gh copilot -- --agent devops-agent -p "$PROMPT" --allow-all 2>&1)
+          RESULT=$(copilot --agent devops-agent -p "$PROMPT" --allow-all 2>&1)
           echo "$RESULT" > /tmp/diagnosis.txt
           echo "Diagnosis complete"
 

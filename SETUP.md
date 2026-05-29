@@ -30,10 +30,10 @@ Two agents work with zero configuration. Test these first:
 
 ```
 # No credentials needed — uses built-in web + GitHub search
-gh copilot -- --agent research-agent -p "What is the latest stable version of Node.js?" --allow-all-urls
+copilot --agent research-agent -p "What is the latest stable version of Node.js?" --allow-all-urls
 
 # No credentials needed — uses shell + built-in GitHub MCP
-gh copilot -- --agent devops-agent -p "List the open GitHub Actions workflows in this repo" --allow-all
+copilot --agent devops-agent -p "List the open GitHub Actions workflows in this repo" --allow-all
 ```
 
 If both respond, your install is good. Move to Step 3 only when you're ready to connect a specific tool.
@@ -47,36 +47,36 @@ Each agent ships without MCP configured so it loads immediately. When you want t
 ### How to add MCP to an agent
 
 1. Open the agent file, e.g. `~/.copilot/agents/data-agent.agent.md`
-2. Find the `tools:` line in the frontmatter
-3. Add the MCP tool names and `mcp-servers:` block **inside the `---` frontmatter fence**
+2. The `tools:` line already includes the MCP namespace (e.g. `"db-mcp/*"`) — no edit needed
+3. Add the `mcp-servers:` block from the matching example **inside the `---` frontmatter fence**
 
-**Before (ships like this — works immediately):**
+**Before (ships like this — works immediately, no MCP):**
 ```yaml
 ---
 name: data-agent
 model: claude-opus-4.7
-tools: ["read", "search", "execute"]
+tools: ["read", "search", "execute", "db-mcp/*"]
 ---
 ```
 
-**After (with Postgres MCP wired in):**
+**After (with SQLite MCP wired in):**
 ```yaml
 ---
 name: data-agent
 model: claude-opus-4.7
-tools: ["read", "search", "execute", "db-mcp/query", "db-mcp/list_tables", "db-mcp/describe_table"]
+tools: ["read", "search", "execute", "db-mcp/*"]
 mcp-servers:
   db-mcp:
     type: 'local'
-    command: npx
-    args: ['-y', '@modelcontextprotocol/server-postgres']
+    command: uvx
+    args: ['mcp-server-sqlite', '--db-path', '/absolute/path/to/your.db']
     tools: ["*"]
-    env:
-      DB_CONNECTION_STRING: ${{ secrets.COPILOT_DB_CONNECTION_STRING }}
 ---
 ```
 
-The full args and env for each provider are in `mcp-examples/`. Just copy the relevant JSON into YAML format.
+> **Why `db-mcp/*` in the agent's `tools:` array?** The Copilot CLI filters MCP server tools through the agent's `tools:` list. Without the namespace, the MCP server loads but its tools are blocked silently. The MCP server key inside `mcp-servers:` (e.g. `db-mcp`) must match the namespace prefix in `tools:`. The shipped configs already match: `mail-mcp`, `vcs-mcp`, `db-mcp`, `cicd-mcp`, `workspace-mcp`.
+
+The full args and env for each provider are in `mcp-examples/`. The JSON keys (e.g. `db-mcp`, `vcs-mcp`) match the namespaces already in each agent's `tools:` list — just copy the JSON contents into YAML format under `mcp-servers:`.
 
 ### Which example to use per agent
 

@@ -2,7 +2,7 @@
 name: workspace-agent
 description: Productivity and collaboration specialist. Works with your team's workspace tools — Microsoft 365, Google Workspace, Slack, Notion, or Confluence. Collects notes, manages tasks, searches documents, and summarises activity. See mcp-examples/workspace/ to wire your platform.
 model: claude-haiku-4.5
-tools: ["read", "web", "execute"]
+tools: ["read", "web", "execute", "workspace-mcp/*"]
 # To add workspace MCP integration, copy a config from mcp-examples/workspace/ and add it here:
 # mcp-servers:
 #   workspace-mcp:

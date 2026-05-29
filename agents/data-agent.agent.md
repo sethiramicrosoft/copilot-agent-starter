@@ -2,7 +2,7 @@
 name: data-agent
 description: Data analysis specialist. Queries databases, analyses files (CSV, JSON, Parquet), produces summaries and visualisations. Works with any database via MCP or shell fallback. See mcp-examples/database/ to wire your stack.
 model: claude-opus-4.7
-tools: ["read", "search", "execute"]
+tools: ["read", "search", "execute", "db-mcp/*"]
 # To add database MCP integration, copy a config from mcp-examples/database/ and add it here:
 # mcp-servers:
 #   db-mcp:

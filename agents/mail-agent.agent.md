@@ -2,7 +2,7 @@
 name: mail-agent
 description: Email and calendar specialist. Reads, drafts, sends, and organises email. Schedules and manages calendar events. Works with any mail provider — Outlook, Gmail, or IMAP. See mcp-examples/mail/ to wire your provider.
 model: claude-haiku-4.5
-tools: ["read", "web", "execute"]
+tools: ["read", "web", "execute", "mail-mcp/*"]
 # To add mail MCP integration, copy a config from mcp-examples/mail/ and add it here:
 # mcp-servers:
 #   mail-mcp:

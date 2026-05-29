@@ -44,8 +44,8 @@ Pick a config from `mcp-examples/`, paste it into the agent's `mcp-servers:` blo
 Most agent setups rely on a prompt saying "only use relevant tools." That's a suggestion. This repo uses the `tools:` array in frontmatter — the platform enforces it. `devops-agent` cannot call mail MCP tools because they're not in its list. Each agent only loads the MCP servers declared in its own file.
 
 ```yaml
-# devops-agent — cannot reach mail or database MCP, platform-enforced
-tools: ["read", "edit", "search", "execute"]
+# devops-agent — only CI tools available, mail/db namespaces blocked at platform level
+tools: ["read", "edit", "search", "execute", "cicd-mcp/*", "github/*"]
 mcp-servers:
   cicd-mcp:
     type: 'local'
@@ -58,7 +58,7 @@ The boundary is verifiable and diffable in version control.
 
 ## Install (2 minutes)
 
-> **Note on the CLI binary** — The official GitHub Copilot CLI is the standalone `copilot` binary, installed via `npm install -g @github/copilot` (see [docs](https://docs.github.com/en/copilot/how-tos/copilot-cli/set-up-copilot-cli/install-copilot-cli)). The examples below use `gh copilot --` (which works if you have the GitHub CLI Copilot extension installed); substitute `copilot` if you're on the standalone install. The flags after `--` are identical.
+> **Prereq:** Install the GitHub Copilot CLI — `npm install -g @github/copilot` ([docs](https://docs.github.com/en/copilot/how-tos/copilot-cli/set-up-copilot-cli/install-copilot-cli)). Binary is `copilot`. Run `copilot` once and follow the auth flow before using the agents.
 
 ```powershell
 # Windows
@@ -84,10 +84,10 @@ Run these two commands to confirm everything is working before you touch anythin
 
 ```bash
 # research-agent — built-in web + GitHub search, zero setup
-gh copilot -- --agent research-agent -p "What is the latest stable version of Node.js?" --allow-all-urls
+copilot --agent research-agent -p "What is the latest stable version of Node.js?" --allow-all-urls
 
 # devops-agent — shell + built-in GitHub MCP, zero setup
-gh copilot -- --agent devops-agent -p "Are there any GitHub Actions workflows in sethiramicrosoft/copilot-agent-starter?" --allow-all
+copilot --agent devops-agent -p "Are there any GitHub Actions workflows in sethiramicrosoft/copilot-agent-starter?" --allow-all
 ```
 
 If both respond, you're good. The other four agents work the same way once you wire their MCP — see [SETUP.md](SETUP.md).
@@ -96,7 +96,7 @@ If both respond, you're good. The other four agents work the same way once you w
 
 **Interactive session** — start a session and select or call an agent by name:
 ```bash
-gh copilot
+copilot
 # inside the session:
 # /agent                            ← browse and pick an agent
 # Use the research-agent to...      ← call by name in your prompt
@@ -104,63 +104,63 @@ gh copilot
 
 **One-shot from the terminal** — useful for scripting or quick tasks:
 ```bash
-gh copilot -- --agent research-agent -p "your prompt here" --allow-all-urls
+copilot --agent research-agent -p "your prompt here" --allow-all-urls
 ```
 
 ## Examples by agent
 
 ### mail-agent
 ```
-gh copilot -- --agent mail-agent -p "Find every unread email from the last 48 hours where someone is waiting on a response from me. List them by urgency with a one-line summary and draft a reply for the top 3." --allow-all
+copilot --agent mail-agent -p "Find every unread email from the last 48 hours where someone is waiting on a response from me. List them by urgency with a one-line summary and draft a reply for the top 3." --allow-all
 
-gh copilot -- --agent mail-agent -p "Find a free 1-hour slot that works for alice@company.com, bob@company.com and me next Tuesday or Wednesday between 10am-4pm London time. Propose 2 options." --allow-all
+copilot --agent mail-agent -p "Find a free 1-hour slot that works for alice@company.com, bob@company.com and me next Tuesday or Wednesday between 10am-4pm London time. Propose 2 options." --allow-all
 
-gh copilot -- --agent mail-agent -p "List every email thread older than 14 days where I sent the last message and got no reply. Group by sender domain." --allow-all
+copilot --agent mail-agent -p "List every email thread older than 14 days where I sent the last message and got no reply. Group by sender domain." --allow-all
 ```
 
 ### project-agent
 ```
-gh copilot -- --agent project-agent -p "Find all GitHub issues labelled 'bug' opened in the last 14 days in this repo. Group by assignee, sort by comment count descending, and output a markdown triage table." --allow-all
+copilot --agent project-agent -p "Find all GitHub issues labelled 'bug' opened in the last 14 days in this repo. Group by assignee, sort by comment count descending, and output a markdown triage table." --allow-all
 
-gh copilot -- --agent project-agent -p "Open a PR from branch 'feature/payments-v2' into main. Link it to issue #84, use the repo's PR template, and fill the 'What changed' section from the commit messages since the branch point." --allow-all
+copilot --agent project-agent -p "Open a PR from branch 'feature/payments-v2' into main. Link it to issue #84, use the repo's PR template, and fill the 'What changed' section from the commit messages since the branch point." --allow-all
 
-gh copilot -- --agent project-agent -p "Generate a changelog from all commits merged to main since the last git tag. Group by type: Features, Fixes, Chores. Exclude merge commits." --allow-all
+copilot --agent project-agent -p "Generate a changelog from all commits merged to main since the last git tag. Group by type: Features, Fixes, Chores. Exclude merge commits." --allow-all
 ```
 
 ### data-agent
 ```
-gh copilot -- --agent data-agent -p "Query the orders table for rows where total != SUM(line_items.amount) for the same order_id. Return the top 20 discrepancies sorted by absolute delta, with order_id, customer_id, recorded total, and calculated total." --allow-all
+copilot --agent data-agent -p "Query the orders table for rows where total != SUM(line_items.amount) for the same order_id. Return the top 20 discrepancies sorted by absolute delta, with order_id, customer_id, recorded total, and calculated total." --allow-all
 
-gh copilot -- --agent data-agent -p "Describe the users table: row count, column names and types, null rate per column, min/max/avg for numeric columns, and 5 sample rows. Flag any column with null rate > 10%." --allow-all
+copilot --agent data-agent -p "Describe the users table: row count, column names and types, null rate per column, min/max/avg for numeric columns, and 5 sample rows. Flag any column with null rate > 10%." --allow-all
 
-gh copilot -- --agent data-agent -p "Find customers who placed at least 3 orders in the past but have had no activity in the last 90 days. Show the top 20 by lifetime value with their last order date and total spend." --allow-all
+copilot --agent data-agent -p "Find customers who placed at least 3 orders in the past but have had no activity in the last 90 days. Show the top 20 by lifetime value with their last order date and total spend." --allow-all
 ```
 
 ### devops-agent
 ```
-gh copilot -- --agent devops-agent -p "Fetch the logs from the last 3 failed runs of the 'build' workflow in this repo. Identify if they share a common root cause and propose a fix." --allow-all
+copilot --agent devops-agent -p "Fetch the logs from the last 3 failed runs of the 'build' workflow in this repo. Identify if they share a common root cause and propose a fix." --allow-all
 
-gh copilot -- --agent devops-agent -p "Review .github/workflows/build.yml and add a cache step for npm dependencies. Show the diff only — do not write the file." --allow-all
+copilot --agent devops-agent -p "Review .github/workflows/build.yml and add a cache step for npm dependencies. Show the diff only — do not write the file." --allow-all
 
-gh copilot -- --agent devops-agent -p "List all workflow runs that deployed to production in the last 7 days. For each: run ID, triggered by, duration, and outcome." --allow-all
+copilot --agent devops-agent -p "List all workflow runs that deployed to production in the last 7 days. For each: run ID, triggered by, duration, and outcome." --allow-all
 ```
 
 ### workspace-agent
 ```
-gh copilot -- --agent workspace-agent -p "Collect every message from the #project-alpha Slack channel this week that contains an action item or a decision. Format as: Decision/Action | Owner | Due date (if mentioned)." --allow-all
+copilot --agent workspace-agent -p "Collect every message from the #project-alpha Slack channel this week that contains an action item or a decision. Format as: Decision/Action | Owner | Due date (if mentioned)." --allow-all
 
-gh copilot -- --agent workspace-agent -p "Summarise the last 3 sprint planning meeting notes from SharePoint/Notion. Extract: goals committed, risks flagged, and any items that were pushed to next sprint." --allow-all
+copilot --agent workspace-agent -p "Summarise the last 3 sprint planning meeting notes from SharePoint/Notion. Extract: goals committed, risks flagged, and any items that were pushed to next sprint." --allow-all
 
-gh copilot -- --agent workspace-agent -p "Search SharePoint and Notion for any document titled or tagged 'ADR' related to the payments service. Summarise the decisions made and the date of each." --allow-all
+copilot --agent workspace-agent -p "Search SharePoint and Notion for any document titled or tagged 'ADR' related to the payments service. Summarise the decisions made and the date of each." --allow-all
 ```
 
 ### research-agent
 ```
-gh copilot -- --agent research-agent -p "Compare Zustand, Jotai, and Redux Toolkit for a large React app (50+ components, team of 8). Produce a trade-off table covering: bundle size, devtools, async handling, learning curve, and community activity. End with a recommendation." --allow-all-urls
+copilot --agent research-agent -p "Compare Zustand, Jotai, and Redux Toolkit for a large React app (50+ components, team of 8). Produce a trade-off table covering: bundle size, devtools, async handling, learning curve, and community activity. End with a recommendation." --allow-all-urls
 
-gh copilot -- --agent research-agent -p "What are the breaking changes in Postgres 16 and 17 that would affect a schema using JSONB columns, partial indexes, and row-level security? Cite the release notes." --allow-all-urls
+copilot --agent research-agent -p "What are the breaking changes in Postgres 16 and 17 that would affect a schema using JSONB columns, partial indexes, and row-level security? Cite the release notes." --allow-all-urls
 
-gh copilot -- --agent research-agent -p "Find production-grade reference implementations of the outbox pattern in Go on GitHub. Show repo name, stars, last commit date, and a one-line summary of the approach each uses." --allow-all-urls
+copilot --agent research-agent -p "Find production-grade reference implementations of the outbox pattern in Go on GitHub. Show repo name, stars, last commit date, and a one-line summary of the approach each uses." --allow-all-urls
 ```
 
 ## Configuring secrets
@@ -322,7 +322,7 @@ The workflow:
 1. Installs `gh` CLI and the Copilot extension on the runner
 2. Copies `devops-agent` into `~/.copilot/agents/`
 3. Fetches the last 200 lines of failed logs via `gh run view --log-failed`
-4. Runs `gh copilot -- --agent devops-agent` with the logs and a structured prompt
+4. Runs `copilot --agent devops-agent` with the logs and a structured prompt
 5. Posts the diagnosis (root cause, why it failed, suggested fix) as a PR comment
 
 ## Use with copilot-fleet-starter
