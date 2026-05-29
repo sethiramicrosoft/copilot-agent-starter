@@ -1,7 +1,7 @@
 ---
 name: devops-agent
 description: CI/CD and infrastructure specialist. Diagnoses pipeline failures, manages build configs, and handles deployment tasks. Shell-first — works with any CI/CD tool. Optionally wire a CI/CD MCP for deeper integration. See mcp-examples/cicd/.
-model: gpt-5.3-codex
+model: gpt-4.1
 tools: ["read", "edit", "search", "execute"]
 # To add CI/CD MCP integration, copy a config from mcp-examples/cicd/ and add it here:
 # mcp-servers:

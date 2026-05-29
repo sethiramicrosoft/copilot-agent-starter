@@ -15,12 +15,12 @@ Domain agents live in `~/.copilot/agents/*.agent.md` machine-wide and in `.githu
 
 | Agent | Model | Why |
 |---|---|---|
-| mail-agent | `claude-sonnet-4.6` | Fast, good at tone-matching and summarisation |
-| project-agent | `gpt-5.3-codex` | Strong on code-adjacent project tasks |
-| data-agent | `claude-opus-4.7` | Complex reasoning for query planning and anomaly detection |
-| devops-agent | `gpt-5.3-codex` | Sharp on YAML, shell, and pipeline patterns |
-| workspace-agent | `claude-sonnet-4.6` | Balanced speed and reasoning for collaboration workflows |
-| research-agent | `claude-opus-4.7` | Deepest reasoning for synthesis and recommendation |
+| mail-agent | `claude-haiku-4.5` | Fast, cheap, excellent at tone-matching and summarisation — email doesn't need heavyweight reasoning |
+| project-agent | `gpt-4.1` | Strong code understanding for reading PRs/issues; output at $8/M vs $14/M for Codex — better value for read-heavy tasks |
+| data-agent | `claude-opus-4.7` | Complex SQL planning, anomaly detection, multi-table reasoning — justified use of the most capable model |
+| devops-agent | `gpt-4.1` | Handles YAML, shell, and pipeline debugging well; Codex specialisation is for generation not diagnosis |
+| workspace-agent | `claude-haiku-4.5` | Summarisation and action-item extraction are squarely in Haiku's wheelhouse at a fraction of Sonnet cost |
+| research-agent | `claude-opus-4.7` | Deep multi-source synthesis and recommendation — the clearest justification for Opus |
 
 ## How to invoke
 

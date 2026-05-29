@@ -300,6 +300,50 @@ Copy any `.agent.md`, update the frontmatter and instructions, drop it in `~/.co
 - `analytics-agent` — Mixpanel / Amplitude / GA queries
 - `finance-agent` — expense and budget queries
 
+## Cost
+
+No extra subscription needed — runs on your existing GitHub Copilot plan.
+
+### How billing works (from June 1, 2026)
+
+GitHub Copilot switched to **usage-based billing** on June 1, 2026. Every agent interaction draws from your plan's monthly **AI Credits** (1 credit = $0.01). Code completions stay free; chat, CLI, and agent use draw credits.
+
+| Plan | Monthly cost | AI Credits included |
+|---|---|---|
+| Copilot Free | $0 | Very limited — not practical for regular agent use |
+| Copilot Pro | $10/mo | 1,000 credits ($10 value) |
+| Copilot Pro+ | $39/mo | 3,900 credits |
+| Copilot Business | $19/user/mo | 1,900 credits/user |
+| Copilot Enterprise | $39/user/mo | 3,900 credits/user |
+
+Credits beyond the included amount are billed at the token rates below. Admins can cap spending to prevent overruns.
+
+### Per-model rates used by these agents
+
+| Model | Used by | Input (per 1M tokens) | Output (per 1M tokens) | Why this model |
+|---|---|---|---|---|
+| `claude-haiku-4.5` | mail-agent, workspace-agent | $1.00 | $5.00 | Fast, cheap, excellent at tone-matching and summarisation |
+| `gpt-4.1` | project-agent, devops-agent | $2.00 | $8.00 | Strong code/YAML understanding; cheaper output than Codex |
+| `claude-opus-4.7` | data-agent, research-agent | $5.00 | $25.00 | Complex SQL reasoning and deep research synthesis justify the cost |
+
+### Rough cost per agent task
+
+A typical agent task uses ~5,000 input tokens + ~1,000 output tokens:
+
+| Agent | Model | Estimated cost per task |
+|---|---|---|
+| mail-agent, workspace-agent | claude-haiku-4.5 | ~$0.01 (~1 credit) |
+| project-agent, devops-agent | gpt-4.1 | ~$0.018 (~2 credits) |
+| data-agent, research-agent | claude-opus-4.7 | ~$0.05 (~5 credits) |
+
+On **Copilot Pro** (1,000 credits/mo) that's roughly **200–1,000 agent tasks per month** depending on which agents you use. On **Pro+** (3,900 credits), roughly 4× that.
+
+### Reducing cost further
+
+If you're still hitting limits, swap `claude-opus-4.7` to `claude-sonnet-4.6` in `data-agent.agent.md` and `research-agent.agent.md`. Change the `model:` line in the frontmatter. You get ~40% of the cost for comparable quality on most tasks.
+
+Full model rates: [docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing](https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing)
+
 ## References
 
 - [Custom agents configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
