@@ -169,21 +169,32 @@ Quick answer: they're different products solving different problems. You don't h
 - Built for knowledge workers, not developers specifically
 
 **copilot-agent-starter** (runs on your existing GitHub Copilot subscription):
-- Runs anywhere the CLI runs — terminal, GitHub Actions, CI runners, containers
+- **Interactive use: your machine needs to be on**, same as any CLI tool
 - Each agent has platform-enforced tool scoping (`tools:` array, not just instructions)
 - Each agent scopes its own MCP servers — devops-agent can't reach mail MCP
 - Works with GitHub, GitLab, Jira, Postgres, Snowflake, Slack, M365, Notion — whatever you already use
 - No second vendor contract
 
+**What runs in GitHub Actions (headless, no laptop):**
+
+| Agent | Works in GitHub Actions? | Notes |
+|---|---|---|
+| devops-agent | ✅ Yes | Shell + GitHub MCP built-in. Natural fit for CI. |
+| project-agent | ⚠️ Partially | GitHub operations work; other VCS needs MCP on the runner |
+| data-agent | ⚠️ Partially | Works if your DB is reachable from the runner |
+| research-agent | ❌ No | Web search is not available in cloud/headless mode |
+| workspace-agent | ❌ Not really | Technically possible but no practical CI use case |
+| mail-agent | ❌ Not really | Technically possible but no practical CI use case |
+
 ### Feature comparison
 
 | | M365 CoWork | Claude Cowork | agent-starter |
 |---|---|---|---|
-| **Runs without a laptop** | ✅ cloud | ❌ laptop must be on | ✅ CI / headless / anywhere |
+| **Runs without a laptop** | ✅ cloud — confirmed, tasks keep running across devices | ❌ laptop must stay on and app open | ❌ interactive use needs your machine on; devops-agent runs headless in GitHub Actions |
 | **Works outside Microsoft stack** | ⚠️ 3rd party via MCP (Frontier preview, admin setup) | ✅ plugins | ✅ any MCP server |
 | **You control model per agent** | ❌ Microsoft routes | ❌ Claude only | ✅ per-agent in YAML |
 | **Platform-enforced tool scoping** | ✅ | ❌ plugin OAuth | ✅ `tools:` array |
-| **Runs in GitHub Actions** | ❌ | ❌ | ✅ documented |
+| **Runs in GitHub Actions** | ❌ | ❌ | ⚠️ devops-agent yes; project-agent partially; research/mail/workspace no |
 | **Can query a database** | limited | ❌ | ✅ via MCP |
 | **No extra subscription** | ❌ $30–99/mo add-on | ❌ separate paid plan | ✅ uses your GHCP seat |
 | **Org semantic index** | ✅ Work IQ | ❌ | ❌ |
@@ -198,7 +209,7 @@ Quick answer: they're different products solving different problems. You don't h
 
 **agent-starter** — you have GHCP and want domain agents for your actual dev workflow. Especially useful if:
 - You're on GitLab, Jira, Snowflake, or anything outside Microsoft's ecosystem
-- You need agents that run in CI without a laptop
+- You want devops-agent running headless in GitHub Actions as a CI diagnostic tool
 - You don't want to pay for another platform subscription
 - You want tool boundaries enforced at the platform level, not just by prompt
 
