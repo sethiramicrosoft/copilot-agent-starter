@@ -57,7 +57,7 @@ cp copilot-agent-starter/AGENTS.md ~/.copilot/
 cp -r copilot-agent-starter/agents ~/.copilot/
 ```
 
-Then pick your MCP configs from `mcp-examples/` and set secrets — see [Configuring secrets](#configuring-secrets).
+That's it. All six agents load immediately — no MCP config needed to get started. Test with `research-agent` or `devops-agent` first (zero credentials), then wire MCP for the others when you're ready. See [SETUP.md](SETUP.md) for the full walkthrough.
 
 ## Usage
 

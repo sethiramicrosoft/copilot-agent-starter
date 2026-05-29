@@ -1,60 +1,98 @@
 # Setup Guide
 
-This guide helps you configure the agent fleet for your organisation's specific toolstack, and shows which roles in your organisation benefit most from each agent.
+This guide helps you get agents running and then wire them to your own tools via MCP.
 
 ---
 
-## Step 1 — Pick your stack
+## Step 1 — Install
 
-Choose one MCP config per category and copy it into the relevant agent's `mcp-servers:` block.
+```powershell
+# Windows
+git clone https://github.com/sethiramicrosoft/copilot-agent-starter.git
+Copy-Item .\copilot-agent-starter\copilot-instructions.md $env:USERPROFILE\.copilot\
+Copy-Item .\copilot-agent-starter\AGENTS.md $env:USERPROFILE\.copilot\
+Copy-Item .\copilot-agent-starter\agents $env:USERPROFILE\.copilot\ -Recurse
+```
 
-### Mail
-
-| Provider | Config file |
-|---|---|
-| Microsoft Outlook / Exchange | `mcp-examples/mail/outlook.json` |
-| Gmail / Google Workspace | `mcp-examples/mail/gmail.json` |
-
-### Version control & project management
-
-| Tool | Config file |
-|---|---|
-| GitHub | `mcp-examples/vcs/github.json` |
-| GitLab | `mcp-examples/vcs/gitlab.json` |
-| Jira | `mcp-examples/vcs/jira.json` |
-| Azure DevOps Boards | `mcp-examples/vcs/azure-devops.json` |
-
-### CI/CD
-
-| Tool | Config file |
-|---|---|
-| GitHub Actions | `mcp-examples/cicd/github-actions.json` |
-| Azure DevOps Pipelines | `mcp-examples/cicd/azure-devops.json` |
-| GitLab CI | `mcp-examples/cicd/gitlab-ci.json` |
-| No MCP available (Jenkins, CircleCI, etc.) | Use `execute` shell fallback — agent uses your CI CLI |
-
-### Database
-
-| Database | Config file |
-|---|---|
-| PostgreSQL | `mcp-examples/database/postgres.json` |
-| SQLite | `mcp-examples/database/sqlite.json` |
-| SQL Server | `mcp-examples/database/mssql.json` |
-| Snowflake | `mcp-examples/database/snowflake.json` |
-
-### Workspace / collaboration
-
-| Platform | Config file |
-|---|---|
-| Microsoft 365 (Teams, SharePoint, Planner) | `mcp-examples/workspace/m365.json` |
-| Slack | `mcp-examples/workspace/slack.json` |
-| Notion | `mcp-examples/workspace/notion.json` |
+```bash
+# macOS / Linux
+git clone https://github.com/sethiramicrosoft/copilot-agent-starter.git
+cp copilot-agent-starter/copilot-instructions.md ~/.copilot/
+cp copilot-agent-starter/AGENTS.md ~/.copilot/
+cp -r copilot-agent-starter/agents ~/.copilot/
+```
 
 ---
 
-## Step 2 — Set secrets
+## Step 2 — Verify it works before touching anything else
 
-After choosing your configs, set these as Copilot agent secrets at the org or repo level:
+Two agents work with zero configuration. Test these first:
+
+```
+# No credentials needed — uses built-in web + GitHub search
+gh copilot -- --agent research-agent -p "What is the latest stable version of Node.js?" --allow-all-urls
+
+# No credentials needed — uses shell + built-in GitHub MCP
+gh copilot -- --agent devops-agent -p "List the open GitHub Actions workflows in this repo" --allow-all
+```
+
+If both respond, your install is good. Move to Step 3 only when you're ready to connect a specific tool.
+
+---
+
+## Step 3 — Wire an MCP (optional, per agent)
+
+Each agent ships without MCP configured so it loads immediately. When you want to connect a real backend, open the agent file and add the `mcp-servers:` block from the matching example in `mcp-examples/`.
+
+### How to add MCP to an agent
+
+1. Open the agent file, e.g. `~/.copilot/agents/data-agent.agent.md`
+2. Find the `tools:` line in the frontmatter
+3. Add the MCP tool names and `mcp-servers:` block **inside the `---` frontmatter fence**
+
+**Before (ships like this — works immediately):**
+```yaml
+---
+name: data-agent
+model: claude-opus-4.7
+tools: ["read", "search", "execute"]
+---
+```
+
+**After (with Postgres MCP wired in):**
+```yaml
+---
+name: data-agent
+model: claude-opus-4.7
+tools: ["read", "search", "execute", "db-mcp/query", "db-mcp/list_tables", "db-mcp/describe_table"]
+mcp-servers:
+  db-mcp:
+    type: stdio
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-postgres"]
+    env:
+      DB_CONNECTION_STRING: ${{ secrets.COPILOT_DB_CONNECTION_STRING }}
+---
+```
+
+The full args and env for each provider are in `mcp-examples/`. Just copy the relevant JSON into YAML format.
+
+### Which example to use per agent
+
+| Agent | Pick from |
+|---|---|
+| mail-agent | `mcp-examples/mail/` — outlook.json, gmail.json |
+| project-agent | `mcp-examples/vcs/` — github.json, gitlab.json, jira.json, azure-devops.json |
+| devops-agent | `mcp-examples/cicd/` — github-actions.json, azure-devops.json, gitlab-ci.json |
+| data-agent | `mcp-examples/database/` — postgres.json, sqlite.json, mssql.json, snowflake.json |
+| workspace-agent | `mcp-examples/workspace/` — m365.json, slack.json, notion.json |
+| research-agent | No MCP needed — built-in web + GitHub search |
+
+---
+
+## Step 4 — Set secrets (only for agents with MCP wired)
+
+Set secrets as environment variables or Copilot agent secrets. Only set what you actually use.
 
 | Secret name | Used by |
 |---|---|
@@ -63,30 +101,12 @@ After choosing your configs, set these as Copilot agent secrets at the org or re
 | `COPILOT_MAIL_TENANT_ID` | mail-agent (Outlook only) |
 | `COPILOT_VCS_TOKEN` | project-agent |
 | `COPILOT_VCS_ORG` | project-agent |
-| `COPILOT_CICD_TOKEN` | devops-agent |
-| `COPILOT_CICD_ORG` | devops-agent |
+| `COPILOT_CICD_TOKEN` | devops-agent (with CI/CD MCP) |
+| `COPILOT_CICD_ORG` | devops-agent (with CI/CD MCP) |
 | `COPILOT_DB_CONNECTION_STRING` | data-agent |
 | `COPILOT_WORKSPACE_CLIENT_ID` | workspace-agent |
 | `COPILOT_WORKSPACE_CLIENT_SECRET` | workspace-agent |
 | `COPILOT_WORKSPACE_TENANT_ID` | workspace-agent (M365 only) |
-
----
-
-## Step 3 — Install
-
-```powershell
-# Windows
-Copy-Item .\copilot-instructions.md $env:USERPROFILE\.copilot\
-Copy-Item .\AGENTS.md $env:USERPROFILE\.copilot\
-Copy-Item .\agents $env:USERPROFILE\.copilot\ -Recurse
-```
-
-```bash
-# macOS / Linux
-cp copilot-instructions.md ~/.copilot/
-cp AGENTS.md ~/.copilot/
-cp -r agents ~/.copilot/
-```
 
 ---
 
