@@ -1,6 +1,6 @@
 # copilot-agent-starter
 
-A reference setup for **domain-scoped agents** on GitHub Copilot CLI. Each agent owns a domain, pins its own model, and wires its own MCP servers — no shared context, no tool bleed.
+A vendor-agnostic reference setup for **domain-scoped agents** on GitHub Copilot CLI. Each agent owns a domain, pins its own model, and wires its own MCP servers. Swap the MCP config for your stack — the agent behaviour stays the same.
 
 Companion to [copilot-fleet-starter](https://github.com/sethiramicrosoft/copilot-fleet-starter) (code review personas). This repo is the execution layer; that repo is the review layer.
 
@@ -8,16 +8,32 @@ Companion to [copilot-fleet-starter](https://github.com/sethiramicrosoft/copilot
 
 ```
 ~/.copilot/
-├── copilot-instructions.md      ← global house rules
-├── AGENTS.md                    ← agent catalog + model assignments
+├── copilot-instructions.md
+├── AGENTS.md                         ← agent catalog + model assignments
 └── agents/
-    ├── mail-agent.agent.md      ← Outlook/Gmail MCP, claude-sonnet-4.6
-    ├── github-agent.agent.md    ← GitHub MCP scoped, gpt-5.3-codex
-    ├── data-agent.agent.md      ← SQLite/DB MCP, claude-opus-4.7
-    ├── devops-agent.agent.md    ← GitHub Actions + shell, gpt-5.3-codex
-    ├── m365-agent.agent.md      ← Microsoft Graph MCP, claude-sonnet-4.6
-    └── research-agent.agent.md  ← web + GitHub search, claude-opus-4.7
+    ├── mail-agent.agent.md           ← any mail provider (Outlook, Gmail, IMAP)
+    ├── project-agent.agent.md        ← any VCS/PM tool (GitHub, GitLab, Jira, ADO)
+    ├── data-agent.agent.md           ← any database (Postgres, Snowflake, SQLite...)
+    ├── devops-agent.agent.md         ← any CI/CD (GitHub Actions, ADO, GitLab, Jenkins)
+    ├── workspace-agent.agent.md      ← any workspace (M365, Slack, Notion, Confluence)
+    └── research-agent.agent.md       ← web + code search, cited reports
+
+mcp-examples/
+├── mail/       → outlook.json, gmail.json
+├── database/   → postgres.json, sqlite.json, snowflake.json, mssql.json
+├── cicd/       → github-actions.json, azure-devops.json, gitlab-ci.json
+├── workspace/  → m365.json, slack.json, notion.json
+└── vcs/        → github.json, gitlab.json, jira.json
 ```
+
+## Why vendor-agnostic?
+
+Each `.agent.md` separates two things:
+
+1. **Behaviour** — what the agent does, how it behaves, what it ignores. Never changes regardless of your stack.
+2. **MCP config** — which external tool it connects to. The only thing you swap.
+
+Pick your configs from `mcp-examples/`, paste into the agent's `mcp-servers:` block, set secrets, done.
 
 ## What makes this different from personas
 

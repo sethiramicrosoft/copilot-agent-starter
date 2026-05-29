@@ -1,0 +1,10 @@
+{
+  "workspace-mcp": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-notion"],
+    "env": {
+      "NOTION_API_KEY": "${{ secrets.COPILOT_WORKSPACE_CLIENT_SECRET }}"
+    }
+  }
+}

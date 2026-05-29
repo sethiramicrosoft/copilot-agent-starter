@@ -1,0 +1,14 @@
+{
+  "db-mcp": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-snowflake"],
+    "env": {
+      "SNOWFLAKE_ACCOUNT": "${{ secrets.COPILOT_SNOWFLAKE_ACCOUNT }}",
+      "SNOWFLAKE_USER": "${{ secrets.COPILOT_SNOWFLAKE_USER }}",
+      "SNOWFLAKE_PASSWORD": "${{ secrets.COPILOT_SNOWFLAKE_PASSWORD }}",
+      "SNOWFLAKE_DATABASE": "${{ secrets.COPILOT_SNOWFLAKE_DATABASE }}",
+      "SNOWFLAKE_WAREHOUSE": "${{ secrets.COPILOT_SNOWFLAKE_WAREHOUSE }}"
+    }
+  }
+}

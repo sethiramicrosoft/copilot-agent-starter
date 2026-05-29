@@ -1,0 +1,11 @@
+{
+  "vcs-mcp": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-jira"],
+    "env": {
+      "JIRA_URL": "${{ secrets.COPILOT_VCS_ORG }}",
+      "JIRA_TOKEN": "${{ secrets.COPILOT_VCS_TOKEN }}"
+    }
+  }
+}

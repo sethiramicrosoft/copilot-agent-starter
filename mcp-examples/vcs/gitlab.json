@@ -1,0 +1,11 @@
+{
+  "vcs-mcp": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-gitlab"],
+    "env": {
+      "GITLAB_TOKEN": "${{ secrets.COPILOT_VCS_TOKEN }}",
+      "GITLAB_URL": "https://gitlab.com"
+    }
+  }
+}

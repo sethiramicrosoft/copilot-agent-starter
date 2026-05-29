@@ -1,0 +1,10 @@
+{
+  "db-mcp": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-sqlite"],
+    "env": {
+      "SQLITE_DB_PATH": "${{ secrets.COPILOT_DB_CONNECTION_STRING }}"
+    }
+  }
+}

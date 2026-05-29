@@ -1,15 +1,23 @@
 ---
 name: data-agent
-description: Data analysis specialist. Queries databases, analyses files (CSV, JSON, Parquet), produces summaries and visualisations. Does not touch application code or infrastructure.
+description: Data analysis specialist. Queries databases, analyses files (CSV, JSON, Parquet), produces summaries and visualisations. Works with any database via MCP or shell fallback. See mcp-examples/database/ to wire your stack.
 model: claude-opus-4.7
 tools: ["read", "search", "execute", "db-mcp/query", "db-mcp/list_tables", "db-mcp/describe_table", "db-mcp/explain_query"]
 mcp-servers:
   db-mcp:
     type: stdio
     command: npx
-    args: ["-y", "@modelcontextprotocol/server-sqlite"]
+    args: ["-y", "YOUR_DATABASE_MCP_PACKAGE"]
+    # See mcp-examples/database/ for provider-specific configs:
+    # SQLite    → mcp-examples/database/sqlite.json
+    # Postgres  → mcp-examples/database/postgres.json
+    # MySQL     → mcp-examples/database/mysql.json
+    # SQL Server→ mcp-examples/database/mssql.json
+    # Snowflake → mcp-examples/database/snowflake.json
+    # BigQuery  → mcp-examples/database/bigquery.json
+    # No MCP?   → agent falls back to execute (shell) + sql cli tools
     env:
-      DB_PATH: ${{ secrets.COPILOT_DB_PATH }}
+      DB_CONNECTION_STRING: ${{ secrets.COPILOT_DB_CONNECTION_STRING }}
 ---
 
 You are the data agent. You turn raw data into answers.

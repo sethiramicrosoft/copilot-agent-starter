@@ -1,0 +1,10 @@
+{
+  "vcs-mcp": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-github"],
+    "env": {
+      "GITHUB_TOKEN": "${{ secrets.COPILOT_VCS_TOKEN }}"
+    }
+  }
+}

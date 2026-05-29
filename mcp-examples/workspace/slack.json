@@ -1,0 +1,11 @@
+{
+  "workspace-mcp": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-slack"],
+    "env": {
+      "SLACK_BOT_TOKEN": "${{ secrets.COPILOT_WORKSPACE_CLIENT_ID }}",
+      "SLACK_TEAM_ID": "${{ secrets.COPILOT_WORKSPACE_TENANT_ID }}"
+    }
+  }
+}
