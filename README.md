@@ -235,18 +235,18 @@ Quick answer: they're different products solving different problems. You don't h
 
 ### What each product does
 
-**Microsoft Copilot Cowork** (Microsoft, Research Preview March 2026; included with M365 Copilot via the Frontier program — no separate add-on price published):
+**Microsoft Copilot Cowork** (Microsoft, GA May 1, 2026; bundled into M365 E7 at $99/user/month — same bundle that includes Agent 365 and Entra Suite. Early-access Frontier participants got it from March 30, 2026):
 - Runs in the cloud — no desktop app needed
 - Powered by Anthropic's Claude (Opus 4.8 rolling out late May 2026; earlier previews used Opus 4.6/Sonnet 4.6)
 - Has Work IQ underneath: a semantic index of your org's M365 data, org graph, Dynamics, and external data via federated MCP connectors (GA May 5, 2026)
 - Microsoft controls model routing — you don't pick
-- Native to M365 ecosystem; 3rd party tools available via MCP connectors (requires admin setup)
+- Native to M365 ecosystem; 3rd party tools available via MCP connectors (requires admin setup); partner integrations include monday.com, S&P Global, Miro
 
-**Microsoft Agent 365** (Microsoft, available in M365 E7 bundle at $99/user/month; standalone pricing not publicly listed):
+**Microsoft Agent 365** (Microsoft, included in M365 E7 bundle at $99/user/month; no standalone price publicly listed):
 - Not an AI agent itself — it's the **governance and control plane** for AI agents inside your Microsoft tenant
 - Lets IT admins observe, govern, and secure both Microsoft and third-party agents
 - Relevant for enterprises that need audit trails and policy controls over agent activity
-- E7 bundle ($99/user/mo) combines E5 + Copilot + Agent 365 + Entra Suite
+- E7 bundle ($99/user/mo) combines E5 + Copilot + Copilot Cowork + Agent 365 + Entra Suite
 
 **Claude Cowork** (Anthropic, 2026, requires a paid Claude plan):
 - Runs on your desktop — your laptop has to be on and the app open
@@ -284,7 +284,7 @@ Quick answer: they're different products solving different problems. You don't h
 | **Platform-enforced tool scoping** | ✅ tenant permissions + governance | ✅ governance layer | ❌ plugin OAuth consent | ✅ `tools:` array |
 | **Runs in GitHub Actions** | ❌ | ❌ | ❌ | ⚠️ devops-agent yes; project-agent partially |
 | **Can query a database** | ⚠️ M365 data only (Excel, SharePoint) | ⚠️ via connectors/agents | ✅ via Data plugin (Snowflake, BigQuery, Databricks, SQL) | ✅ via MCP |
-| **No extra subscription** | ⚠️ included with M365 Copilot via Frontier opt-in | ❌ $99/user/mo E7 bundle (standalone price not published) | ❌ separate paid plan | ✅ uses your GHCP seat |
+| **No extra subscription** | ❌ $99/user/mo E7 bundle (or M365 Copilot + Frontier opt-in during preview) | ❌ $99/user/mo E7 bundle (no standalone price published) | ❌ separate paid plan | ✅ uses your GHCP seat |
 | **Org semantic index** | ✅ Work IQ | ✅ via Work IQ | ❌ | ❌ |
 | **Computer use (apps, browser)** | ❌ | ❌ | ✅ Claude-in-Chrome connector + desktop apps | ❌ |
 | **Non-technical user UX** | ✅ knowledge worker UX + IT admin controls | ✅ IT admin UX | ✅ | ❌ CLI only |
