@@ -242,11 +242,13 @@ Quick answer: they're different products solving different problems. You don't h
 - Microsoft controls model routing — you don't pick
 - Native to M365 ecosystem; 3rd party tools available via MCP connectors (requires admin setup); partner integrations include monday.com, S&P Global, Miro
 
-**Microsoft Agent 365** (Microsoft, included in M365 E7 bundle at $99/user/month; no standalone price publicly listed):
+**Microsoft Agent 365** (Microsoft, GA May 1, 2026; $15/user/month standalone, or included in M365 E7 at $99/user/month):
 - Not an AI agent itself — it's the **governance and control plane** for AI agents inside your Microsoft tenant
 - Lets IT admins observe, govern, and secure both Microsoft and third-party agents
+- Provides Entra identity per agent; integrates with Defender and Purview for compliance
 - Relevant for enterprises that need audit trails and policy controls over agent activity
-- E7 bundle ($99/user/mo) combines E5 + Copilot + Copilot Cowork + Agent 365 + Entra Suite
+- E7 bundle ($99/user/mo, GA May 1 2026) combines E5 + Copilot (with Cowork features) + Agent 365 + Entra Suite — ~15% cheaper than buying these separately (~$117/mo)
+- Compute/runtime for agents themselves billed separately via Copilot Studio or Foundry consumption
 
 **Claude Cowork** (Anthropic, 2026, requires a paid Claude plan):
 - Runs on your desktop — your laptop has to be on and the app open
@@ -284,7 +286,7 @@ Quick answer: they're different products solving different problems. You don't h
 | **Platform-enforced tool scoping** | ✅ tenant permissions + governance | ✅ governance layer | ❌ plugin OAuth consent | ✅ `tools:` array |
 | **Runs in GitHub Actions** | ❌ | ❌ | ❌ | ⚠️ devops-agent yes; project-agent partially |
 | **Can query a database** | ⚠️ M365 data only (Excel, SharePoint) | ⚠️ via connectors/agents | ✅ via Data plugin (Snowflake, BigQuery, Databricks, SQL) | ✅ via MCP |
-| **No extra subscription** | ❌ $99/user/mo E7 bundle (or M365 Copilot + Frontier opt-in during preview) | ❌ $99/user/mo E7 bundle (no standalone price published) | ❌ separate paid plan | ✅ uses your GHCP seat |
+| **No extra subscription** | ❌ part of M365 E7 at $99/user/mo (or M365 Copilot + Frontier opt-in during preview) | ❌ $15/user/mo standalone or in E7 bundle | ❌ separate paid plan | ✅ uses your GHCP seat |
 | **Org semantic index** | ✅ Work IQ | ✅ via Work IQ | ❌ | ❌ |
 | **Computer use (apps, browser)** | ❌ | ❌ | ✅ Claude-in-Chrome connector + desktop apps | ❌ |
 | **Non-technical user UX** | ✅ knowledge worker UX + IT admin controls | ✅ IT admin UX | ✅ | ❌ CLI only |
@@ -388,11 +390,11 @@ No extra subscription needed — runs on your existing GitHub Copilot plan.
 
 GitHub Copilot switched to **usage-based billing** on June 1, 2026. Every agent interaction draws from your plan's monthly **AI Credits** (1 credit = $0.01). Code completions stay free; chat, CLI, and agent use draw credits.
 
-| Plan | Monthly cost | AI Credits / month (base + flex) |
+| Plan | Monthly cost | AI Credits / month |
 |---|---|---|
-| Copilot Free | $0 | Very limited — not practical for regular agent use |
-| Copilot Pro | $10/mo | 1,500 (1,000 base + 500 flex) |
-| Copilot Pro+ | $39/mo | 7,000 (3,900 base + 3,100 flex) |
+| Copilot Free | $0 | Very limited (50 chat req/mo) — not practical for regular agent use |
+| Copilot Pro | $10/mo | 1,000 (= $10 value at $0.01/credit) |
+| Copilot Pro+ | $39/mo | 3,900 |
 | Copilot Business | $19/user/mo | 1,900/user |
 | Copilot Enterprise | $39/user/mo | 3,900/user |
 
